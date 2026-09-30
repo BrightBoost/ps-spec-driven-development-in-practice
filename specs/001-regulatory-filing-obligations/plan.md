@@ -1,6 +1,7 @@
 # Implementation Plan: Regulatory filing obligations
 
-Status: Draft
+Status: Approved for tasking (DEC-001)
+Status history: Draft -> Changes requested -> Approved for tasking
 Spec: `.sdd/spec.md` | Constitution: `.specify/memory/constitution.md`
 
 ## Context
@@ -38,8 +39,24 @@ Spring Boot REST API on Java 21, built with the Maven wrapper. Empty project; no
 
 - Domain tests for the working-day calendar: weekends, fixed holidays, roll-forward
 - Domain tests for deadline state: at-risk, on-track, and overdue obligations
+- Boundary tests at exactly three working days (`AT_RISK`) and four working days (`ON_TRACK`), including a boundary that spans a weekend
 - Controller tests for create and retrieve
+- Controller test for an unknown identifier (404 Problem Details)
 - A test for the due-soon report
+
+## Traceability
+
+| Spec ID | Plan step | Test | Status |
+|---|---|---|---|
+| AC-001 | Controller, Service | `ObligationDeadlineControllerTest.ac001_*` | Planned |
+| AC-002 | Validation and error mapping | `ObligationDeadlineControllerTest.ac002_*` | Planned |
+| AC-003 | Deadline policy | `DeadlineStatePolicyTest` boundary table (3 working days) | Planned |
+| AC-004 | Working-day calendar | `WorkingDayCalendarTest`, `ObligationDeadlineControllerTest.ac004_*` | Planned |
+| AC-005 | Deadline policy | `DeadlineStatePolicyTest` boundary table (4 working days) | Planned |
+| AC-006 | Deadline policy | `DeadlineStatePolicyTest` (past due) | Planned |
+| AC-007 | Escalation | `ObligationDeadlineControllerTest.ac007_*` | Planned |
+| AC-008 | Persistence and report query | `DueSoonReportTest` | Planned |
+| AC-009 | Validation and error mapping | `ObligationDeadlineControllerTest.ac009_*` | Planned |
 
 ## Risks
 
