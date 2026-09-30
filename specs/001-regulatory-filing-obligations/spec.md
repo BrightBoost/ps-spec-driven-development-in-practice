@@ -1,4 +1,7 @@
-# Obligations Tracker: regulatory filing obligations
+# Feature Specification: Regulatory filing obligations
+
+Feature branch: `001-regulatory-filing-obligations`
+Source: approved `.sdd/spec.md` (Module 1)
 
 Status: approved for planning
 
@@ -21,6 +24,25 @@ One regulatory filing obligation has one due date, one owner email, one effectiv
 - Which holidays are on the fixed demo list? New Year's Day, Easter Monday, King's Day, Liberation Day, Ascension Day, Whit Monday, Christmas Day, and Boxing Day, for 2026 and 2027.
 - Are overdue obligations part of the due-soon report? Yes. An overdue filing needs attention.
 - Which error format does the API use? RFC 9457 Problem Details (`application/problem+json`).
+
+## User scenarios (illustrative)
+
+The EARS acceptance criteria below are authoritative. These scenarios illustrate them.
+
+**Scenario 1: a filing that needs attention** (illustrates `AC-003`, `AC-007`)
+- Given today is Monday 2026-10-05
+- And a filing obligation is due on Thursday 2026-10-08
+- When the lawyer retrieves the obligation
+- Then its deadline state is `AT_RISK` and its escalation state is `ESCALATED`
+
+**Scenario 2: a due date on a weekend** (illustrates `AC-004`)
+- Given a filing obligation is created with a due date of Saturday 2026-10-10
+- Then its effective due date is Monday 2026-10-12
+
+**Scenario 3: the due-soon report** (illustrates `AC-008`)
+- Given one overdue obligation and two at-risk obligations
+- When the lawyer opens the due-soon report
+- Then all three are listed, earliest effective due date first
 
 ## Functional requirements
 
@@ -93,6 +115,12 @@ THE SYSTEM SHALL return all AT_RISK and OVERDUE obligations, earliest effective 
 `AC-009`
 IF an obligation is requested by an identifier that does not exist,
 THEN THE SYSTEM SHALL return status 404 and a Problem Details body.
+
+## Clarifications
+
+### Session 2026-09-30
+
+- Q: Which date counts as the current date for a request that arrives just after midnight? A: The local date in Europe/Amsterdam (see constitution).
 
 ## Test outline
 
