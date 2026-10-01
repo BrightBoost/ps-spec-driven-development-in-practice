@@ -39,8 +39,8 @@ class ObligationDeadlineControllerTest {
     }
 
     @Test
-    void ac007_escalationOwnerIsReturnedWhenAtRisk() {
-        // TODO assert escalationState=ESCALATED and escalationOwner
+    void ac007_escalationRecipientsAreReturnedWhenAtRisk() {
+        // TODO assert escalationState=ESCALATED and both escalationRecipients
     }
 
     @Test

@@ -11,8 +11,8 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Status: Todo
 
 ## T-002 Define the obligation representation and server-assigned identifier
-- Goal: An obligation record and an in-memory repository that assigns identifiers
-- Spec links: FR-001, FR-002
+- Goal: An obligation record (due date, owner email, compliance lead email) and an in-memory repository that assigns identifiers
+- Spec links: FR-001, FR-002, DEC-002
 - Depends on: T-001
 - Files likely affected: `domain/Obligation.java`, `domain/ObligationRepository.java`, `ObligationRepositoryTest.java`
 - Verification: `./mvnw -q -Dtest=ObligationRepositoryTest test`
@@ -27,7 +27,7 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Status: Todo
 
 ## T-004 Create and retrieve endpoints with Problem Details errors
-- Goal: `POST /obligations` and `GET /obligations/{id}`, with 400 and 404 as Problem Details
+- Goal: `POST /obligations` (including compliance lead email) and `GET /obligations/{id}`, with 400 and 404 as Problem Details
 - Spec links: AC-001, AC-002, AC-009
 - Depends on: T-002
 - Files likely affected: `api/ObligationController.java`, `api/*Request.java`, `api/*Response.java`, `api/ApiExceptionHandler.java`, `domain/ObligationService.java`
@@ -35,17 +35,18 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Status: Todo
 
 ## T-005 Expose escalation state and escalation owner
+- Replaced by: T-010 (DEC-002)
 - Goal: Escalation state and escalation owner in the obligation response
 - Spec links: AC-007
 - Depends on: T-003, T-004
 - Files likely affected: `domain/EscalationState.java`, `api/ObligationResponse.java`
 - Verification: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test`
-- Status: Todo
+- Status: Obsolete
 
 ## T-006 Due-soon report endpoint and query
 - Goal: `GET /obligations/due-soon` returning AT_RISK and OVERDUE obligations, earliest effective due date first
 - Spec links: FR-003, AC-008
-- Depends on: T-003
+- Depends on: T-003, T-010
 - Files likely affected: `domain/ObligationService.java`, `api/ObligationController.java`, `DueSoonReportTest.java`
 - Verification: `./mvnw -q -Dtest=DueSoonReportTest test`
 - Status: Todo
@@ -71,4 +72,12 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Spec links: all AC-IDs
 - Depends on: T-001 to T-008
 - Verification: `./mvnw test`, independent audit, manual requests
+- Status: Todo
+
+## T-010 Expose escalation state and escalation recipients
+- Goal: Escalation state and escalation recipients (owner and compliance lead) in the obligation response
+- Spec links: AC-007, DEC-002
+- Depends on: T-003, T-004
+- Files likely affected: `domain/EscalationState.java`, `domain/EscalationPolicy.java`, `api/ObligationResponse.java`
+- Verification: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test`
 - Status: Todo

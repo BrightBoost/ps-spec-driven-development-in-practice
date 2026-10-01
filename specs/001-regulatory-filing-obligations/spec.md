@@ -7,14 +7,14 @@ Status: approved for planning
 
 ## Scope
 
-One regulatory filing obligation has one due date, one owner email, one effective due date, and is at risk from three working days before its effective due date.
+One regulatory filing obligation has one due date, one owner email, one compliance lead email, one effective due date, and is at risk from three working days before its effective due date.
 
 | | |
 |---|---|
-| **In scope** | One obligation type: a regulatory filing obligation. Create an obligation with a due date and an owner email. Calculate an effective due date: a due date on a weekend or a fixed demo holiday rolls forward to the next working day (Europe/Amsterdam). An obligation is at risk from three working days before its effective due date. A due-soon report of obligations that need attention. Escalation as a visible state on the obligation. |
+| **In scope** | One obligation type: a regulatory filing obligation. Create an obligation with a due date, an owner email, and a compliance lead email. Calculate an effective due date: a due date on a weekend or a fixed demo holiday rolls forward to the next working day (Europe/Amsterdam). An obligation is at risk from three working days before its effective due date. A due-soon report of obligations that need attention. Escalation as a visible state on the obligation. |
 | **Out of scope** | Recurring obligations. Automatic email delivery or any other notification. Multiple escalation levels. User-configurable calendars. A configurable at-risk threshold per obligation. Role-based administration. |
 | **Actors** | A lawyer on the compliance team (product owner and main user). Developers maintaining the tracker. |
-| **Inputs** | Due date. Owner email. |
+| **Inputs** | Due date. Owner email. Compliance lead email (DEC-002). |
 | **Outputs** | Obligation with identifier, due date, effective due date, deadline state, and escalation state. Due-soon report. |
 | **Assumptions** | The demo uses a fixed list of public holidays for 2026 and 2027. Dates are evaluated in Europe/Amsterdam. |
 | **Open questions** | _(none: see answers below)_ |
@@ -33,7 +33,7 @@ The EARS acceptance criteria below are authoritative. These scenarios illustrate
 - Given today is Monday 2026-10-05
 - And a filing obligation is due on Thursday 2026-10-08
 - When the lawyer retrieves the obligation
-- Then its deadline state is `AT_RISK` and its escalation state is `ESCALATED`
+- Then its deadline state is `AT_RISK`, its escalation state is `ESCALATED`, and the owner and compliance lead are listed as escalation recipients
 
 **Scenario 2: a due date on a weekend** (illustrates `AC-004`)
 - Given a filing obligation is created with a due date of Saturday 2026-10-10
@@ -46,7 +46,7 @@ The EARS acceptance criteria below are authoritative. These scenarios illustrate
 
 ## Functional requirements
 
-- `FR-001`: The system shall create a regulatory filing obligation from a due date and an owner email
+- `FR-001`: The system shall create a regulatory filing obligation from a due date, an owner email, and a compliance lead email (DEC-002)
 - `FR-002`: The system shall retrieve an obligation by its server-assigned identifier
 - `FR-003`: The system shall list obligations that are at risk or overdue, sorted by effective due date, earliest first
 - `FR-004`: The system shall calculate an effective due date using Europe/Amsterdam working-day rules
@@ -63,7 +63,7 @@ The EARS acceptance criteria below are authoritative. These scenarios illustrate
 - `EC-005`: The due date falls on a fixed demo holiday
 - `EC-006`: The effective due date is in the past
 - `EC-007`: The due date is not a valid date
-- `EC-008`: The owner email is blank
+- `EC-008`: The owner email or the compliance lead email is blank
 - `EC-009`: The obligation identifier does not exist
 
 ## Non-functional requirements
@@ -77,11 +77,11 @@ The EARS acceptance criteria below are authoritative. These scenarios illustrate
 ## Acceptance criteria
 
 `AC-001`
-WHEN a create request contains a valid due date and owner email,
+WHEN a create request contains a valid due date, owner email, and compliance lead email,
 THE SYSTEM SHALL store the obligation and return status 201 with a server-assigned identifier and the effective due date.
 
 `AC-002`
-IF a create request contains an invalid due date or a blank owner email,
+IF a create request contains an invalid due date, a blank owner email, or a blank compliance lead email,
 THEN THE SYSTEM SHALL reject the request with status 400 and a Problem Details body.
 
 `AC-003`
@@ -105,8 +105,8 @@ THE SYSTEM SHALL return deadlineState=OVERDUE.
 
 `AC-007`
 WHILE deadlineState is AT_RISK or OVERDUE,
-THE SYSTEM SHALL return escalationState=ESCALATED and escalationOwner set to the owner email.
-Otherwise, THE SYSTEM SHALL return escalationState=NONE.
+THE SYSTEM SHALL return escalationState=ESCALATED and escalationRecipients containing the owner email and the compliance lead email (DEC-002).
+Otherwise, THE SYSTEM SHALL return escalationState=NONE and an empty escalationRecipients list.
 
 `AC-008`
 WHEN the due-soon report is requested,
