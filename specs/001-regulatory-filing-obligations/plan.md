@@ -66,4 +66,4 @@ Spring Boot REST API on Java 21, built with the Maven wrapper. Empty project; no
 
 ## Open decisions
 
-- Calculate the due-soon report in the application or in the database? No product impact; decide in the task that implements the report.
+- Calculate the due-soon report in the application or in the database? No product impact; decided in T-006.
