@@ -26,7 +26,7 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Depends on: T-001, T-002
 - Files likely affected: `domain/DeadlineStatePolicy.java`, `domain/DeadlineState.java`, `DeadlineStatePolicyTest.java`
 - Verification: `./mvnw -q -Dtest=DeadlineStatePolicyTest test`
-- Status: Todo
+- Status: Done
 
 ## T-004 Create and retrieve endpoints with Problem Details errors
 - Goal: `POST /obligations` (including compliance lead email) and `GET /obligations/{id}`, with 400 and 404 as Problem Details
