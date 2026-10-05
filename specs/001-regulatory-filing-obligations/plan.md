@@ -46,17 +46,17 @@ Spring Boot REST API on Java 21, built with the Maven wrapper. Empty project; no
 
 ## Traceability
 
-| Spec ID | Plan step | Test | Status |
-|---|---|---|---|
-| AC-001 | Controller, Service | `ObligationDeadlineControllerTest.ac001_*` | Planned |
-| AC-002 | Validation and error mapping | `ObligationDeadlineControllerTest.ac002_*` | Planned |
-| AC-003 | Deadline policy | `DeadlineStatePolicyTest` boundary table (3 working days) | Planned |
-| AC-004 | Working-day calendar | `WorkingDayCalendarTest`, `ObligationDeadlineControllerTest.ac004_*` | Planned |
-| AC-005 | Deadline policy | `DeadlineStatePolicyTest` boundary table (4 working days) | Planned |
-| AC-006 | Deadline policy | `DeadlineStatePolicyTest` (past due) | Planned |
-| AC-007 | Escalation (recipients, DEC-002) | `ObligationDeadlineControllerTest.ac007_*` | Planned |
-| AC-008 | Persistence and report query | `DueSoonReportTest` | Planned |
-| AC-009 | Validation and error mapping | `ObligationDeadlineControllerTest.ac009_*` | Planned |
+| Spec ID | Plan step | Implementation | Unit test | Controller test | Manual request | Status |
+|---|---|---|---|---|---|---|
+| AC-001 | Controller, Service | `ObligationService.create` | `ObligationServiceTest.ac001_*` | `ObligationDeadlineControllerTest.ac001_*` | | Done |
+| AC-002 | Validation and error mapping | `ObligationService.create`, `ApiExceptionHandler` | `ObligationServiceTest.ac002_*` | `ObligationDeadlineControllerTest.ac002_*` | | Done |
+| AC-003 | Deadline policy | `DeadlineStatePolicy.stateFor` | `DeadlineStatePolicyTest` (3 working days) | `ObligationDeadlineControllerTest.ac003_*` | | Done |
+| AC-004 | Working-day calendar | `WorkingDayCalendar.onOrNextWorkingDay` | `WorkingDayCalendarTest`, `DeadlineStatePolicyTest.ac004_*` | `ObligationDeadlineControllerTest.ac004_*` | | Done |
+| AC-005 | Deadline policy | `DeadlineStatePolicy.stateFor` | `DeadlineStatePolicyTest` (4 working days) | | | Done |
+| AC-006 | Deadline policy | `DeadlineStatePolicy.stateFor` | `DeadlineStatePolicyTest` (past due) | `ObligationDeadlineControllerTest.ac006_*` | | Done |
+| AC-007 | Escalation (recipients, DEC-002) | `ObligationService.view` | `ObligationServiceTest.ac007_*` | `ObligationDeadlineControllerTest.ac007_*` | | Done |
+| AC-008 | Persistence and report query | `ObligationService.dueSoon` | `ObligationServiceTest.ac008_*` | `DueSoonReportTest` | | Done |
+| AC-009 | Validation and error mapping | `ApiExceptionHandler.notFound` | `ObligationServiceTest.ac009_*` | `ObligationDeadlineControllerTest.ac009_*` | | Done |
 
 ## Risks
 
@@ -66,4 +66,4 @@ Spring Boot REST API on Java 21, built with the Maven wrapper. Empty project; no
 
 ## Open decisions
 
-- Calculate the due-soon report in the application or in the database? No product impact; decided in T-006.
+- ~~Calculate the due-soon report in the application or in the database?~~ Decided in T-006: in the application, over the in-memory repository.

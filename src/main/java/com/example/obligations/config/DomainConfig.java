@@ -1,11 +1,14 @@
 package com.example.obligations.config;
 
+import java.time.Clock;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.example.obligations.calendar.WorkingDayCalendar;
 import com.example.obligations.domain.DeadlineStatePolicy;
 import com.example.obligations.domain.ObligationRepository;
+import com.example.obligations.domain.ObligationService;
 
 /** Domain classes stay free of framework annotations; they are wired here. */
 @Configuration
@@ -24,5 +27,10 @@ public class DomainConfig {
     @Bean
     ObligationRepository obligationRepository() {
         return new ObligationRepository();
+    }
+
+    @Bean
+    ObligationService obligationService(ObligationRepository repository, DeadlineStatePolicy policy, Clock clock) {
+        return new ObligationService(repository, policy, clock);
     }
 }

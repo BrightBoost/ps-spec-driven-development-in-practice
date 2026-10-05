@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Due soon - Obligations Tracker</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; color: #1f2933; }
+    h1 { font-size: 1.4rem; }
+    table { border-collapse: collapse; min-width: 36rem; }
+    th, td { text-align: left; padding: .5rem .8rem; border-bottom: 1px solid #d9dee3; }
+    .AT_RISK { color: #9a5b00; font-weight: 600; }
+    .OVERDUE { color: #b42318; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1>Due soon</h1>
+  <table>
+    <thead><tr><th>Obligation</th><th>Effective due date</th><th>Deadline state</th><th>Escalation</th></tr></thead>
+    <tbody id="rows"><tr><td colspan="4">Loading...</td></tr></tbody>
+  </table>
+  <script>
+    fetch('/obligations/due-soon')
+      .then(response => response.json())
+      .then(obligations => {
+        const rows = document.getElementById('rows');
+        rows.innerHTML = '';
+        if (obligations.length === 0) {
+          rows.innerHTML = '<tr><td colspan="4">Nothing needs attention.</td></tr>';
+        }
+        for (const o of obligations) {
+          const tr = document.createElement('tr');
+          [o.id, o.effectiveDueDate, o.deadlineState, o.escalationState].forEach((value, i) => {
+            const td = document.createElement('td');
+            td.textContent = value;
+            if (i === 2) td.className = value;
+            tr.appendChild(td);
+          });
+          rows.appendChild(tr);
+        }
+      })
+      .catch(() => {
+        document.getElementById('rows').innerHTML = '<tr><td colspan="4">Could not load the report.</td></tr>';
+      });
+  </script>
+</body>
+</html>

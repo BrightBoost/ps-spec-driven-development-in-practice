@@ -34,7 +34,7 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Depends on: T-002
 - Files likely affected: `api/ObligationController.java`, `api/*Request.java`, `api/*Response.java`, `api/ApiExceptionHandler.java`, `domain/ObligationService.java`
 - Verification: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test`
-- Status: Todo
+- Status: Done
 
 ## T-005 Expose escalation state and escalation owner
 - Replaced by: T-010 (DEC-002)
@@ -51,7 +51,7 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Depends on: T-003, T-010
 - Files likely affected: `domain/ObligationService.java`, `api/ObligationController.java`, `DueSoonReportTest.java`
 - Verification: `./mvnw -q -Dtest=DueSoonReportTest test`
-- Status: Todo
+- Status: Done
 
 ## T-007 Controller tests for invalid due date and unknown identifier
 - Goal: Evidence for the error paths
@@ -59,7 +59,7 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Depends on: T-004
 - Files likely affected: `ObligationDeadlineControllerTest.java`
 - Verification: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test`
-- Status: Todo
+- Status: Done
 
 ## T-008 Minimal browser view for the due-soon report
 - Goal: A static page that shows the due-soon report
@@ -67,7 +67,7 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Depends on: T-006
 - Files likely affected: `src/main/resources/static/index.html`
 - Verification: open `http://localhost:8080/` with the demo profile and compare with `GET /obligations/due-soon`
-- Status: Todo
+- Status: Done
 
 ## T-009 Full verification pass and traceability update
 - Goal: Every acceptance criterion has passing evidence in the plan's traceability table
@@ -82,4 +82,4 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Depends on: T-003, T-004
 - Files likely affected: `domain/EscalationState.java`, `domain/EscalationPolicy.java`, `api/ObligationResponse.java`
 - Verification: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test`
-- Status: Todo
+- Status: Done
