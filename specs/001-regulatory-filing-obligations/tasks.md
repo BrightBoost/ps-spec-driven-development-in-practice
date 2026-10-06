@@ -26,7 +26,8 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Depends on: T-001, T-002
 - Files likely affected: `domain/DeadlineStatePolicy.java`, `domain/DeadlineState.java`, `DeadlineStatePolicyTest.java`
 - Verification: `./mvnw -q -Dtest=DeadlineStatePolicyTest test`
-- Status: Done
+- Status: Verified
+- Evidence: `./mvnw -q -Dtest=DeadlineStatePolicyTest test` passed; traceability rows AC-003 to AC-006, 2026-10-06
 
 ## T-004 Create and retrieve endpoints with Problem Details errors
 - Goal: `POST /obligations` (including compliance lead email) and `GET /obligations/{id}`, with 400 and 404 as Problem Details
@@ -34,7 +35,8 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Depends on: T-002
 - Files likely affected: `api/ObligationController.java`, `api/*Request.java`, `api/*Response.java`, `api/ApiExceptionHandler.java`, `domain/ObligationService.java`
 - Verification: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test`
-- Status: Done
+- Status: Verified
+- Evidence: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test` passed; manual requests AC-001, AC-002, AC-009, 2026-10-06
 
 ## T-005 Expose escalation state and escalation owner
 - Replaced by: T-010 (DEC-002)
@@ -51,7 +53,8 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Depends on: T-003, T-010
 - Files likely affected: `domain/ObligationService.java`, `api/ObligationController.java`, `DueSoonReportTest.java`
 - Verification: `./mvnw -q -Dtest=DueSoonReportTest test`
-- Status: Done
+- Status: Verified
+- Evidence: `./mvnw -q -Dtest=DueSoonReportTest test` passed (includes overdue and ordering), 2026-10-06
 
 ## T-007 Controller tests for invalid due date and unknown identifier
 - Goal: Evidence for the error paths
@@ -59,7 +62,8 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Depends on: T-004
 - Files likely affected: `ObligationDeadlineControllerTest.java`
 - Verification: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test`
-- Status: Done
+- Status: Verified
+- Evidence: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test` passed, 2026-10-06
 
 ## T-008 Minimal browser view for the due-soon report
 - Goal: A static page that shows the due-soon report
@@ -67,14 +71,16 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Depends on: T-006
 - Files likely affected: `src/main/resources/static/index.html`
 - Verification: open `http://localhost:8080/` with the demo profile and compare with `GET /obligations/due-soon`
-- Status: Done
+- Status: Verified
+- Evidence: browser view matches `GET /obligations/due-soon` with the demo profile, 2026-10-06
 
 ## T-009 Full verification pass and traceability update
 - Goal: Every acceptance criterion has passing evidence in the plan's traceability table
 - Spec links: all AC-IDs
 - Depends on: T-001 to T-008
 - Verification: `./mvnw test`, independent audit, manual requests
-- Status: Todo
+- Status: Verified
+- Evidence: `./mvnw test` passed; independent audit pass for all AC-IDs; traceability table complete, 2026-10-06
 
 ## T-010 Expose escalation state and escalation recipients
 - Goal: Escalation state and escalation recipients (owner and compliance lead) in the obligation response
@@ -82,4 +88,5 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Depends on: T-003, T-004
 - Files likely affected: `domain/EscalationState.java`, `domain/EscalationPolicy.java`, `api/ObligationResponse.java`
 - Verification: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test`
-- Status: Done
+- Status: Verified
+- Evidence: `ObligationDeadlineControllerTest.ac003_*` and `ac007_*` assert both recipients, 2026-10-06

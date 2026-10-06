@@ -46,17 +46,19 @@ Spring Boot REST API on Java 21, built with the Maven wrapper. Empty project; no
 
 ## Traceability
 
+Evidence run: `./mvnw test` passed; manual requests against `./mvnw spring-boot:run -Dspring-boot.run.profiles=demo` (today = 2026-10-07); independent audit (Copilot) pass for all AC-IDs after adding the AC-008 report test.
+
 | Spec ID | Plan step | Implementation | Unit test | Controller test | Manual request | Status |
 |---|---|---|---|---|---|---|
-| AC-001 | Controller, Service | `ObligationService.create` | `ObligationServiceTest.ac001_*` | `ObligationDeadlineControllerTest.ac001_*` | | Done |
-| AC-002 | Validation and error mapping | `ObligationService.create`, `ApiExceptionHandler` | `ObligationServiceTest.ac002_*` | `ObligationDeadlineControllerTest.ac002_*` | | Done |
-| AC-003 | Deadline policy | `DeadlineStatePolicy.stateFor` | `DeadlineStatePolicyTest` (3 working days) | `ObligationDeadlineControllerTest.ac003_*` | | Done |
-| AC-004 | Working-day calendar | `WorkingDayCalendar.onOrNextWorkingDay` | `WorkingDayCalendarTest`, `DeadlineStatePolicyTest.ac004_*` | `ObligationDeadlineControllerTest.ac004_*` | | Done |
-| AC-005 | Deadline policy | `DeadlineStatePolicy.stateFor` | `DeadlineStatePolicyTest` (4 working days) | | | Done |
-| AC-006 | Deadline policy | `DeadlineStatePolicy.stateFor` | `DeadlineStatePolicyTest` (past due) | `ObligationDeadlineControllerTest.ac006_*` | | Done |
-| AC-007 | Escalation (recipients, DEC-002) | `ObligationService.view` | `ObligationServiceTest.ac007_*` | `ObligationDeadlineControllerTest.ac007_*` | | Done |
-| AC-008 | Persistence and report query | `ObligationService.dueSoon` | `ObligationServiceTest.ac008_*` | `DueSoonReportTest` | | Done |
-| AC-009 | Validation and error mapping | `ApiExceptionHandler.notFound` | `ObligationServiceTest.ac009_*` | `ObligationDeadlineControllerTest.ac009_*` | | Done |
+| AC-001 | Controller, Service | `ObligationService.create` | `ObligationServiceTest.ac001_*` | `ObligationDeadlineControllerTest.ac001_*` | `POST /obligations` -> 201, `obl-104` | Verified |
+| AC-002 | Validation and error mapping | `ObligationService.create`, `ApiExceptionHandler` | `ObligationServiceTest.ac002_*` | `ObligationDeadlineControllerTest.ac002_*` | `POST` with `2026-13-45` -> 400 problem+json | Verified |
+| AC-003 | Deadline policy | `DeadlineStatePolicy.stateFor` | `DeadlineStatePolicyTest` (3 working days) | `ObligationDeadlineControllerTest.ac003_*` | demo `GET /obligations/obl-100` -> AT_RISK | Verified |
+| AC-004 | Working-day calendar | `WorkingDayCalendar.onOrNextWorkingDay` | `WorkingDayCalendarTest`, `DeadlineStatePolicyTest.ac004_*` | `ObligationDeadlineControllerTest.ac004_*` | demo `obl-100` due Sat 10-10 -> effective 10-12 | Verified |
+| AC-005 | Deadline policy | `DeadlineStatePolicy.stateFor` | `DeadlineStatePolicyTest` (4 working days) | `ObligationDeadlineControllerTest.ac005_*` | demo `GET /obligations/obl-101` -> ON_TRACK | Verified |
+| AC-006 | Deadline policy | `DeadlineStatePolicy.stateFor` | `DeadlineStatePolicyTest` (past due) | `ObligationDeadlineControllerTest.ac006_*` | demo `GET /obligations/obl-102` -> OVERDUE | Verified |
+| AC-007 | Escalation (recipients, DEC-002) | `ObligationService.view` | `ObligationServiceTest.ac007_*` | `ObligationDeadlineControllerTest.ac007_*` | demo `obl-100` -> ESCALATED, 2 recipients | Verified |
+| AC-008 | Persistence and report query | `ObligationService.dueSoon` | `ObligationServiceTest.ac008_*` | `DueSoonReportTest` (includes overdue, order) | demo `GET /obligations/due-soon` + browser view | Verified |
+| AC-009 | Validation and error mapping | `ApiExceptionHandler.notFound` | `ObligationServiceTest.ac009_*` | `ObligationDeadlineControllerTest.ac009_*` | `GET /obligations/obl-999` -> 404 problem+json | Verified |
 
 ## Risks
 
