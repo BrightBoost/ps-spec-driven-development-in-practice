@@ -26,7 +26,7 @@ One regulatory filing obligation has one due date, one owner email, one effectiv
 
 - `FR-001`: The system shall create a regulatory filing obligation from a due date and an owner email
 - `FR-002`: The system shall retrieve an obligation by its server-assigned identifier
-- `FR-003`: The system shall list obligations that are at risk or overdue, sorted by effective due date earliest first
+- `FR-003`: The system shall list obligations that are at risk or overdue, sorted by effective due date, earliest first
 - `FR-004`: The system shall calculate an effective due date using Europe/Amsterdam working-day rules
 - `FR-005`: The system shall expose a deadline state of `ON_TRACK`, `AT_RISK`, or `OVERDUE`
 - `FR-006`: The system shall expose escalation as a visible state and shall not send notifications
@@ -51,3 +51,54 @@ One regulatory filing obligation has one due date, one owner email, one effectiv
 - `NFR-003`: The working-day calendar uses a fixed list of demo holidays for 2026 and 2027
 - `NFR-004`: Errors use RFC 9457 Problem Details (`application/problem+json`)
 - `NFR-005`: All tests run through the Maven wrapper
+
+## Acceptance criteria
+
+`AC-001`
+WHEN a create request contains a valid due date and owner email,
+THE SYSTEM SHALL store the obligation and return status 201 with a server-assigned identifier and the effective due date.
+
+`AC-002`
+IF a create request contains an invalid due date or a blank owner email,
+THEN THE SYSTEM SHALL reject the request with status 400 and a Problem Details body.
+
+`AC-003`
+WHILE the effective due date of an obligation is between zero and three working days after the current date in Europe/Amsterdam,
+WHEN the obligation is retrieved,
+THE SYSTEM SHALL return deadlineState=AT_RISK.
+
+`AC-004`
+WHEN an obligation is created with a due date that is not a working day,
+THE SYSTEM SHALL set effectiveDueDate to the next working day.
+
+`AC-005`
+WHILE the effective due date of an obligation is more than three working days after the current date,
+WHEN the obligation is retrieved,
+THE SYSTEM SHALL return deadlineState=ON_TRACK.
+
+`AC-006`
+WHILE the effective due date of an obligation is before the current date,
+WHEN the obligation is retrieved,
+THE SYSTEM SHALL return deadlineState=OVERDUE.
+
+`AC-007`
+WHILE deadlineState is AT_RISK or OVERDUE,
+THE SYSTEM SHALL return escalationState=ESCALATED and escalationOwner set to the owner email.
+Otherwise, THE SYSTEM SHALL return escalationState=NONE.
+
+`AC-008`
+WHEN the due-soon report is requested,
+THE SYSTEM SHALL return all AT_RISK and OVERDUE obligations, earliest effective due date first.
+
+`AC-009`
+IF an obligation is requested by an identifier that does not exist,
+THEN THE SYSTEM SHALL return status 404 and a Problem Details body.
+
+## Test outline
+
+| Criterion | Test setup | Expected observable result | Potential ambiguity |
+|---|---|---|---|
+| `AC-003` | Current date Monday 2026-10-05; due Thursday 2026-10-08 (three working days) | `effectiveDueDate=2026-10-08`, `AT_RISK`, `ESCALATED` | _(none)_ |
+| `AC-005` | Current date Monday 2026-10-05; due Friday 2026-10-09 (four working days) | `ON_TRACK`, `NONE` | _(none)_ |
+| `AC-004` | Due Saturday 2026-10-10 | `effectiveDueDate=2026-10-12` (Monday) | _(none)_ |
+| `AC-004` | Due Sunday 2026-04-26; Monday 2026-04-27 is King's Day | `effectiveDueDate=2026-04-28` (Tuesday) | _(none)_ |
