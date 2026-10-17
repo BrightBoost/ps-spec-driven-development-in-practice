@@ -1,6 +1,6 @@
 # Obligations Tracker: regulatory filing obligations
 
-Status: draft
+Status: approved for planning
 
 ## Scope
 
