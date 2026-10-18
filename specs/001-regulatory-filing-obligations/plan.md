@@ -1,5 +1,8 @@
 # Implementation Plan: Regulatory Filing Obligations
 
+Status: Approved for tasking (DEC-001)
+Status history: Draft -> Changes requested -> Approved for tasking
+
 **Branch**: `001-regulatory-filing-obligations` | **Date**: 2026-10-18 | **Spec**: [spec.md](./spec.md)
 
 **Input**: Approved feature specification at `specs/001-regulatory-filing-obligations/spec.md`
@@ -41,6 +44,26 @@ Deliver a Spring Boot REST API for creating, retrieving, and listing regulatory 
 | V. Maven Wrapper Only | Run verification through `./mvnw`. | PASS |
 
 No gate violations identified.
+
+## Test strategy
+
+- Boundary tests at exactly three working days (`AT_RISK`) and four working days (`ON_TRACK`), including a boundary that spans a weekend
+- Deadline state tests for overdue obligations and for an obligation due today
+- Controller tests for create, retrieve and the unknown-identifier 404
+
+## Traceability
+
+| Spec ID | Plan step | Test | Status |
+|---|---|---|---|
+| AC-001 | Controller, JDBC repository | `api` and `persistence` tests (201, ID, restart) | Planned |
+| AC-002 | Validation and error mapping | `api` tests (400 Problem Details) | Planned |
+| AC-003 | Service: deadline state | `service` boundary test at 3 working days | Planned |
+| AC-004 | Service: working-day calendar | `service` calendar tests, `api` roll-forward test | Planned |
+| AC-005 | Service: deadline state | `service` boundary test at 4 working days | Planned |
+| AC-006 | Service: deadline state | `service` past-due test | Planned |
+| AC-007 | Service: escalation | `service` escalation tests | Planned |
+| AC-008 | Controller, repository query | `api` due-soon report test | Planned |
+| AC-009 | Validation and error mapping | `api` unknown-identifier test | Planned |
 
 ## Phase 0: Research
 
