@@ -138,7 +138,7 @@ THE SYSTEM SHALL return deadlineState=OVERDUE.
 
 `AC-007`
 WHILE deadlineState is AT_RISK or OVERDUE,
-THE SYSTEM SHALL return escalationState=ESCALATED and escalationRecipients containing the owner email and the compliance lead email.
+THE SYSTEM SHALL return escalationState=ESCALATED and escalationRecipients containing the owner email followed by the compliance lead email.
 Otherwise, when deadlineState is ON_TRACK, THE SYSTEM SHALL return escalationState=NONE and omit escalationRecipients.
 
 `AC-008`
@@ -179,6 +179,6 @@ THEN THE SYSTEM SHALL return status 404 and a Problem Details body.
 | `AC-005` | Current date Monday 2026-10-05; due Friday 2026-10-09 (four working days) | `ON_TRACK`, `NONE` | _(none)_ |
 | `AC-004` | Due Saturday 2026-10-10 | `effectiveDueDate=2026-10-12` (Monday) | _(none)_ |
 | `AC-004` | Due Sunday 2026-04-26; Monday 2026-04-27 is King's Day | `effectiveDueDate=2026-04-28` (Tuesday) | _(none)_ |
-| `AC-007` | An at-risk obligation with owner and compliance lead emails | `ESCALATED`; `escalationRecipients` contains both emails | _(none)_ |
-| `AC-007` | An overdue obligation with owner and compliance lead emails | `ESCALATED`; `escalationRecipients` contains both emails | _(none)_ |
+| `AC-007` | An at-risk obligation with owner and compliance lead emails | `ESCALATED`; `escalationRecipients` is [owner email, compliance lead email] | _(none)_ |
+| `AC-007` | An overdue obligation with owner and compliance lead emails | `ESCALATED`; `escalationRecipients` is [owner email, compliance lead email] | _(none)_ |
 | `AC-007` | An on-track obligation | `NONE`; `escalationRecipients` is absent | _(none)_ |

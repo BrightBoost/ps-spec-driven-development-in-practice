@@ -57,13 +57,13 @@ No gate violations identified.
 
 | Spec ID | Plan step | Test | Status |
 |---|---|---|---|
-| AC-001 | Controller, JDBC repository | `api` and `persistence` tests (201, ID, effective date, both emails, restart) | Planned |
+| AC-001 | Controller, JDBC repository | `api` and `domain` repository tests (201, ID, effective date, both emails, restart) | Planned |
 | AC-002 | Validation and error mapping | `api` tests (400 Problem Details for invalid date or either blank email) | Planned |
 | AC-003 | Service: deadline state | `service` boundary test at 3 working days | Planned |
 | AC-004 | Service: working-day calendar | `service` calendar tests, `api` roll-forward test | Planned |
 | AC-005 | Service: deadline state | `service` boundary test at 4 working days | Planned |
 | AC-006 | Service: deadline state | `service` past-due test | Planned |
-| AC-007 | Service/API: escalation response | `api` response tests for both recipients when AT_RISK/OVERDUE and NONE without recipients when ON_TRACK | Planned |
+| AC-007 | Service/API: escalation response | `api` response tests for both recipients, in the order owner then compliance lead, when AT_RISK/OVERDUE and NONE without recipients when ON_TRACK | Planned |
 | AC-008 | Controller, repository query | `api` due-soon report test | Planned |
 | AC-009 | Validation and error mapping | `api` unknown-identifier test | Planned |
 
@@ -102,21 +102,21 @@ src/
 ├── main/
 │   ├── java/com/example/obligations/
 │   │   ├── api/            # REST controller and request/response types
-│   │   ├── model/          # Obligation and deadline/escalation states
-│   │   ├── persistence/    # JDBC repository
-│   │   ├── service/        # Obligation operations and business-date rules
+│   │   ├── calendar/       # Working-day calendar and fixed demo holidays
+│   │   ├── config/         # Clock and wiring
+│   │   ├── domain/         # Obligation, states, deadline policy, service, JDBC repository
 │   │   └── ObligationsTrackerApplication.java
 │   └── resources/
 │       ├── application.properties
-│       └── schema.sql
+│       └── static/         # due-soon report page
 └── test/
     └── java/com/example/obligations/
-        ├── api/            # HTTP contract and error tests (AC-001, AC-002, AC-008, AC-009)
-        ├── persistence/    # restart/durable storage tests (AC-001)
-        └── service/        # calendar, state, and escalation tests (AC-003–AC-007)
+        ├── (root)          # HTTP contract and error tests (AC-001, AC-002, AC-008, AC-009)
+        ├── calendar/       # working-day tests (AC-003, AC-004)
+        └── domain/         # restart/durable storage, state, and escalation tests (AC-001, AC-003–AC-007)
 ```
 
-**Structure Decision**: Extend the existing single Maven/Spring Boot application and its `com.example.obligations` package. Keep the API, domain/date logic, and JDBC persistence separated within that project; the only UI is a static due-soon report page served by the same application; add no separate frontend or deployable.
+**Structure Decision**: Extend the existing single Maven/Spring Boot application and its `com.example.obligations` package. Keep the API, calendar, and domain logic (including the JDBC repository, wired in `config/`) separated within that project; the only UI is a static due-soon report page served by the same application; add no separate frontend or deployable.
 
 ## Complexity Tracking
 

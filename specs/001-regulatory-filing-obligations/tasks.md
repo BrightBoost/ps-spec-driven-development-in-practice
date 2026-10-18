@@ -6,7 +6,7 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Goal: A working-day calendar with weekends and the fixed demo holidays for 2026 and 2027; a `Clock` in Europe/Amsterdam
 - Spec links: NFR-002, NFR-003
 - Depends on: -
-- Files likely affected: `service/WorkingDayCalendar.java`, `config/ClockConfig.java`, `WorkingDayCalendarTest.java`
+- Files likely affected: `calendar/WorkingDayCalendar.java`, `config/ClockConfig.java`, `WorkingDayCalendarTest.java`
 - Verification: `./mvnw -q -Dtest=WorkingDayCalendarTest test`
 - Status: Todo
 
@@ -14,7 +14,7 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Goal: An obligation record and a JDBC repository on file-backed H2 that assigns identifiers, stores both contact emails, and survives a restart
 - Spec links: FR-001, FR-002
 - Depends on: T-001
-- Files likely affected: `model/Obligation.java`, `persistence/ObligationRepository.java`, `resources/schema.sql`, `ObligationRepositoryTest.java`
+- Files likely affected: `domain/Obligation.java`, `domain/ObligationRepository.java`, `ObligationRepositoryTest.java`
 - Verification: `./mvnw -q -Dtest=ObligationRepositoryTest test` (assert both emails survive restart)
 - Status: Todo
 
@@ -22,7 +22,7 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Goal: Effective due date and deadline state from the due date and today
 - Spec links: AC-003, AC-004, AC-005, AC-006
 - Depends on: T-001, T-002
-- Files likely affected: `service/DeadlineStatePolicy.java`, `model/DeadlineState.java`, `DeadlineStatePolicyTest.java`
+- Files likely affected: `domain/DeadlineStatePolicy.java`, `domain/DeadlineState.java`, `DeadlineStatePolicyTest.java`
 - Verification: `./mvnw -q -Dtest=DeadlineStatePolicyTest test`
 - Status: Todo
 
@@ -30,7 +30,7 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Goal: `POST /obligations` accepts a due date and nonblank owner and compliance lead emails; `GET /obligations/{id}` retrieves it, with 400 and 404 as Problem Details
 - Spec links: AC-001, AC-002, AC-009
 - Depends on: T-002
-- Files likely affected: `api/ObligationController.java`, `api/*Request.java`, `api/*Response.java`, `api/ApiExceptionHandler.java`, `service/ObligationService.java`
+- Files likely affected: `api/ObligationController.java`, `api/*Request.java`, `api/*Response.java`, `api/ApiExceptionHandler.java`, `domain/ObligationService.java`
 - Verification: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test`
 - Status: Todo
 
@@ -38,7 +38,7 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Goal: Obsolete; replaced by T-010 because the response now returns both escalation recipients rather than a single escalation owner
 - Spec links: AC-007
 - Depends on: T-003, T-004
-- Files likely affected: `model/EscalationState.java`, `api/ObligationResponse.java`
+- Files likely affected: `domain/EscalationState.java`, `api/ObligationResponse.java`
 - Verification: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test`
 - Status: Obsolete
 
@@ -46,7 +46,7 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Goal: Return `ESCALATED` and both contact emails as `escalationRecipients` for AT_RISK and OVERDUE obligations; return `NONE` and omit recipients for ON_TRACK obligations
 - Spec links: AC-007
 - Depends on: T-002, T-003, T-004
-- Files likely affected: `model/EscalationState.java`, `api/ObligationResponse.java`, `service/ObligationService.java`, `ObligationDeadlineControllerTest.java`
+- Files likely affected: `domain/EscalationState.java`, `api/ObligationResponse.java`, `domain/ObligationService.java`, `ObligationDeadlineControllerTest.java`
 - Verification: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test`
 - Status: Todo
 
@@ -54,7 +54,7 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Goal: `GET /obligations/due-soon` returning AT_RISK and OVERDUE obligations, earliest effective due date first; decide application versus database calculation
 - Spec links: FR-003, AC-008
 - Depends on: T-003
-- Files likely affected: `service/ObligationService.java`, `api/ObligationController.java`, `DueSoonReportTest.java`
+- Files likely affected: `domain/ObligationService.java`, `api/ObligationController.java`, `DueSoonReportTest.java`
 - Verification: `./mvnw -q -Dtest=DueSoonReportTest test`
 - Status: Todo
 

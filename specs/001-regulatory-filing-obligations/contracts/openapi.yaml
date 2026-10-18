@@ -33,7 +33,7 @@ paths:
           required: true
           schema:
             type: string
-            format: uuid
+            pattern: '^obl-[0-9]+$'
       responses:
         "200":
           description: Obligation found.
@@ -92,7 +92,8 @@ components:
       properties:
         id:
           type: string
-          format: uuid
+          pattern: '^obl-[0-9]+$'
+          example: obl-100
         dueDate:
           type: string
           format: date
