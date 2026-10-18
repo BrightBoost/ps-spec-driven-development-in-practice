@@ -26,7 +26,7 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Depends on: T-001, T-002
 - Files likely affected: `domain/DeadlineStatePolicy.java`, `domain/DeadlineState.java`, `DeadlineStatePolicyTest.java`
 - Verification: `./mvnw -q -Dtest=DeadlineStatePolicyTest test`
-- Status: Todo
+- Status: Done
 
 ## T-004 Create and retrieve endpoints with Problem Details errors
 - Goal: `POST /obligations` accepts a due date and nonblank owner and compliance lead emails; `GET /obligations/{id}` retrieves it, with 400 and 404 as Problem Details
@@ -34,7 +34,7 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Depends on: T-002
 - Files likely affected: `api/ObligationController.java`, `api/*Request.java`, `api/*Response.java`, `api/ApiExceptionHandler.java`, `domain/ObligationService.java`
 - Verification: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test`
-- Status: Todo
+- Status: Done
 
 ## T-005 Expose escalation state and escalation owner
 - Goal: Obsolete; replaced by T-010 because the response now returns both escalation recipients rather than a single escalation owner
@@ -50,7 +50,7 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Depends on: T-002, T-003, T-004
 - Files likely affected: `domain/EscalationState.java`, `api/ObligationResponse.java`, `domain/ObligationService.java`, `ObligationDeadlineControllerTest.java`
 - Verification: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test`
-- Status: Todo
+- Status: Done
 
 ## T-006 Due-soon report endpoint and query
 - Goal: `GET /obligations/due-soon` returning AT_RISK and OVERDUE obligations, earliest effective due date first; decide application versus database calculation
@@ -58,7 +58,7 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Depends on: T-003
 - Files likely affected: `domain/ObligationService.java`, `api/ObligationController.java`, `DueSoonReportTest.java`
 - Verification: `./mvnw -q -Dtest=DueSoonReportTest test`
-- Status: Todo
+- Status: Done
 
 ## T-007 Controller tests for invalid due date, blank contact emails, and unknown identifier
 - Goal: Evidence for invalid-date and blank-email create errors, plus the unknown-identifier error
@@ -66,7 +66,7 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Depends on: T-004
 - Files likely affected: `ObligationDeadlineControllerTest.java`
 - Verification: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test`
-- Status: Todo
+- Status: Done
 
 ## T-008 Minimal browser view for the due-soon report
 - Goal: A static page that shows the due-soon report
@@ -74,7 +74,7 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Depends on: T-006
 - Files likely affected: `src/main/resources/static/index.html`
 - Verification: open `http://localhost:8080/` with the demo profile and compare with `GET /obligations/due-soon`
-- Status: Todo
+- Status: Done
 
 ## T-009 Full verification pass and traceability update
 - Goal: Every acceptance criterion has passing evidence in the plan's traceability table

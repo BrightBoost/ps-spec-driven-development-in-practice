@@ -55,17 +55,17 @@ No gate violations identified.
 
 ## Traceability
 
-| Spec ID | Plan step | Test | Status |
-|---|---|---|---|
-| AC-001 | Controller, JDBC repository | `api` and `domain` repository tests (201, ID, effective date, both emails, restart) | Planned |
-| AC-002 | Validation and error mapping | `api` tests (400 Problem Details for invalid date or either blank email) | Planned |
-| AC-003 | Service: deadline state | `service` boundary test at 3 working days | Planned |
-| AC-004 | Service: working-day calendar | `service` calendar tests, `api` roll-forward test | Planned |
-| AC-005 | Service: deadline state | `service` boundary test at 4 working days | Planned |
-| AC-006 | Service: deadline state | `service` past-due test | Planned |
-| AC-007 | Service/API: escalation response | `api` response tests for both recipients, in the order owner then compliance lead, when AT_RISK/OVERDUE and NONE without recipients when ON_TRACK | Planned |
-| AC-008 | Controller, repository query | `api` due-soon report test | Planned |
-| AC-009 | Validation and error mapping | `api` unknown-identifier test | Planned |
+| Spec ID | Plan step | Implementation | Unit test | Controller test | Manual request | Status |
+|---|---|---|---|---|---|---|
+| AC-001 | Controller, Service | `ObligationService.create` | `ObligationServiceTest.ac001_*` | `ObligationDeadlineControllerTest.ac001_*` | | Done |
+| AC-002 | Validation and error mapping | `ObligationService.create`, `ApiExceptionHandler` | `ObligationServiceTest.ac002_*` | `ObligationDeadlineControllerTest.ac002_*` | | Done |
+| AC-003 | Deadline policy | `DeadlineStatePolicy.stateFor` | `DeadlineStatePolicyTest` (3 working days) | `ObligationDeadlineControllerTest.ac003_*` | | Done |
+| AC-004 | Working-day calendar | `WorkingDayCalendar.onOrNextWorkingDay` | `WorkingDayCalendarTest`, `DeadlineStatePolicyTest.ac004_*` | `ObligationDeadlineControllerTest.ac004_*` | | Done |
+| AC-005 | Deadline policy | `DeadlineStatePolicy.stateFor` | `DeadlineStatePolicyTest` (4 working days) | | | Done |
+| AC-006 | Deadline policy | `DeadlineStatePolicy.stateFor` | `DeadlineStatePolicyTest` (past due) | `ObligationDeadlineControllerTest.ac006_*` | | Done |
+| AC-007 | Escalation (recipients, DEC-002) | `ObligationService.view` | `ObligationServiceTest.ac007_*` | `ObligationDeadlineControllerTest.ac007_*` | | Done |
+| AC-008 | Persistence and report query | `ObligationService.dueSoon` | `ObligationServiceTest.ac008_*` | `DueSoonReportTest` | | Done |
+| AC-009 | Validation and error mapping | `ApiExceptionHandler.notFound` | `ObligationServiceTest.ac009_*` | `ObligationDeadlineControllerTest.ac009_*` | | Done |
 
 ## Phase 0: Research
 
