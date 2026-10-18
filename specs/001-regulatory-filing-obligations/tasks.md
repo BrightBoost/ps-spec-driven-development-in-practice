@@ -8,7 +8,8 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Depends on: -
 - Files likely affected: `calendar/WorkingDayCalendar.java`, `config/ClockConfig.java`, `WorkingDayCalendarTest.java`
 - Verification: `./mvnw -q -Dtest=WorkingDayCalendarTest test`
-- Status: Todo
+- Status: Verified
+- Evidence: `./mvnw -q -Dtest=WorkingDayCalendarTest test` passed (9 tests), 2026-10-02
 
 ## T-002 Define the obligation representation, server-assigned identifier, and durable storage
 - Goal: An obligation record and a JDBC repository on file-backed H2 that assigns identifiers, stores both contact emails, and survives a restart
@@ -16,7 +17,8 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Depends on: T-001
 - Files likely affected: `domain/Obligation.java`, `domain/ObligationRepository.java`, `ObligationRepositoryTest.java`
 - Verification: `./mvnw -q -Dtest=ObligationRepositoryTest test` (assert both emails survive restart)
-- Status: Todo
+- Status: Verified
+- Evidence: `./mvnw -q -Dtest=ObligationRepositoryTest test` passed (3 tests), 2026-10-02
 
 ## T-003 Implement DeadlineStatePolicy
 - Goal: Effective due date and deadline state from the due date and today
