@@ -20,15 +20,15 @@
 
 ### User Story 1 - Create and review a filing obligation (Priority: P1)
 
-As a lawyer on the compliance team, I can record a regulatory filing's due date and owner email, then review its effective due date, deadline state, and escalation state so that I can see whether it needs attention.
+As a lawyer on the compliance team, I can record a regulatory filing's due date, owner email, and compliance lead email, then review its effective due date, deadline state, and escalation recipients so that the people responsible can see whether it needs attention.
 
 **Why this priority**: Creating and reviewing an obligation is the core value of the tracker.
 
-**Independent Test**: Create an obligation with a valid due date and nonblank owner email, then retrieve it by its server-assigned identifier and check the returned dates and states.
+**Independent Test**: Create an obligation with a valid due date and nonblank owner and compliance lead emails, then retrieve it by its server-assigned identifier and check the returned dates, states, and escalation recipients.
 
 **Acceptance Scenarios**:
 
-1. **Given** a valid due date and nonblank owner email, **When** the obligation is created, **Then** it is stored and returned with status 201, a server-assigned identifier, and its effective due date.
+1. **Given** a valid due date and nonblank owner and compliance lead emails, **When** the obligation is created, **Then** it is stored and returned with status 201, a server-assigned identifier, and its effective due date.
 2. **Given** an obligation whose effective due date is exactly three working days away, **When** it is retrieved, **Then** its deadline state is `AT_RISK`.
 3. **Given** an obligation whose due date is on a weekend or fixed demo holiday, **When** it is created, **Then** its effective due date is the next working day.
 
@@ -45,7 +45,7 @@ As a lawyer on the compliance team, I can request a due-soon report to see oblig
 **Acceptance Scenarios**:
 
 1. **Given** obligations in at-risk, overdue, and on-track states, **When** the due-soon report is requested, **Then** all at-risk and overdue obligations are returned, earliest effective due date first, and on-track obligations are excluded.
-2. **Given** an obligation that is at risk or overdue, **When** it is retrieved, **Then** its escalation state is `ESCALATED` and its escalation owner is the owner email.
+2. **Given** an obligation that is at risk or overdue, **When** it is retrieved, **Then** its escalation state is `ESCALATED` and its escalation recipients contain the owner and compliance lead emails.
 
 ---
 
@@ -55,11 +55,11 @@ As a caller of the tracker, I receive a clear error response when a filing reque
 
 **Why this priority**: Clear rejection behavior makes obligation creation and lookup outcomes unambiguous.
 
-**Independent Test**: Submit an invalid due date, a blank owner email, and a nonexistent obligation identifier; verify the specified error statuses and Problem Details bodies.
+**Independent Test**: Submit an invalid due date, a blank owner email, a blank compliance lead email, and a nonexistent obligation identifier; verify the specified error statuses and Problem Details bodies.
 
 **Acceptance Scenarios**:
 
-1. **Given** an invalid due date or blank owner email, **When** an obligation is created, **Then** the request is rejected with status 400 and a Problem Details body.
+1. **Given** an invalid due date or a blank owner or compliance lead email, **When** an obligation is created, **Then** the request is rejected with status 400 and a Problem Details body.
 2. **Given** an unknown obligation identifier, **When** the obligation is requested, **Then** the response has status 404 and a Problem Details body.
 
 ### Edge Cases
@@ -73,24 +73,25 @@ As a caller of the tracker, I receive a clear error response when a filing reque
 - `EC-007`: The due date is not a valid date
 - `EC-008`: The owner email is blank
 - `EC-009`: The obligation identifier does not exist
+- `EC-010`: The compliance lead email is blank
 
 ## Scope
 
-One regulatory filing obligation has one due date, one owner email, one effective due date, and is at risk from three working days before its effective due date.
+One regulatory filing obligation has one due date, one owner email, one compliance lead email, one effective due date, and is at risk from three working days before its effective due date.
 
 | | |
 |---|---|
-| **In scope** | One obligation type: a regulatory filing obligation. Create an obligation with a due date and an owner email. Calculate an effective due date: a due date on a weekend or a fixed demo holiday rolls forward to the next working day (Europe/Amsterdam). An obligation is at risk from three working days before its effective due date. A due-soon report of obligations that need attention. Escalation as a visible state on the obligation. |
+| **In scope** | One obligation type: a regulatory filing obligation. Create an obligation with a due date, owner email, and compliance lead email. Calculate an effective due date: a due date on a weekend or a fixed demo holiday rolls forward to the next working day (Europe/Amsterdam). An obligation is at risk from three working days before its effective due date. A due-soon report of obligations that need attention. Escalation as a visible state and, when escalated, recipients on the obligation. |
 | **Out of scope** | Recurring obligations. Automatic email delivery or any other notification. Multiple escalation levels. User-configurable calendars. A configurable at-risk threshold per obligation. Role-based administration. Caller authentication (deployment-level access restrictions are outside this feature). |
 | **Actors** | A lawyer on the compliance team (product owner and main user). Developers maintaining the tracker. |
-| **Inputs** | Due date. Owner email. |
-| **Outputs** | Obligation with identifier, due date, effective due date, deadline state, and escalation state. Due-soon report. |
+| **Inputs** | Due date. Owner email. Compliance lead email. |
+| **Outputs** | Obligation with identifier, due date, effective due date, deadline state, escalation state, and escalation recipients when escalated. Due-soon report. |
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
-- **FR-001**: The system shall create a regulatory filing obligation from a due date and a nonblank owner email, retain it across application restarts, and not validate the format of a nonblank owner email
+- **FR-001**: The system shall create a regulatory filing obligation from a due date and nonblank owner and compliance lead emails, retain it across application restarts, and not validate the format of a nonblank owner email
 - **FR-002**: The system shall retrieve an obligation by its server-assigned identifier
 - **FR-003**: The system shall list obligations that are at risk or overdue, sorted by effective due date, earliest first
 - **FR-004**: The system shall calculate an effective due date using Europe/Amsterdam working-day rules
@@ -109,11 +110,11 @@ One regulatory filing obligation has one due date, one owner email, one effectiv
 ### Acceptance Criteria
 
 `AC-001`
-WHEN a create request contains a valid due date and nonblank owner email,
+WHEN a create request contains a valid due date, nonblank owner email, and nonblank compliance lead email,
 THE SYSTEM SHALL store the obligation and return status 201 with a server-assigned identifier and the effective due date.
 
 `AC-002`
-IF a create request contains an invalid due date or a blank owner email,
+IF a create request contains an invalid due date or a blank owner email or a blank compliance lead email,
 THEN THE SYSTEM SHALL reject the request with status 400 and a Problem Details body.
 
 `AC-003`
@@ -137,8 +138,8 @@ THE SYSTEM SHALL return deadlineState=OVERDUE.
 
 `AC-007`
 WHILE deadlineState is AT_RISK or OVERDUE,
-THE SYSTEM SHALL return escalationState=ESCALATED and escalationOwner set to the owner email.
-Otherwise, THE SYSTEM SHALL return escalationState=NONE.
+THE SYSTEM SHALL return escalationState=ESCALATED and escalationRecipients containing the owner email and the compliance lead email.
+Otherwise, when deadlineState is ON_TRACK, THE SYSTEM SHALL return escalationState=NONE and omit escalationRecipients.
 
 `AC-008`
 WHEN the due-soon report is requested,
@@ -150,7 +151,7 @@ THEN THE SYSTEM SHALL return status 404 and a Problem Details body.
 
 ### Key Entities
 
-- **Regulatory filing obligation**: A filing with an identifier, due date, owner email, effective due date, deadline state, and escalation state.
+- **Regulatory filing obligation**: A filing with an identifier, due date, owner email, compliance lead email, effective due date, deadline state, and escalation state; escalated filings also have escalation recipients.
 - **Working-day calendar**: The Europe/Amsterdam calendar rules and fixed demo holidays used to determine an effective due date and working-day intervals.
 - **Due-soon report**: The ordered set of obligations whose deadline state is `AT_RISK` or `OVERDUE`.
 
@@ -178,3 +179,6 @@ THEN THE SYSTEM SHALL return status 404 and a Problem Details body.
 | `AC-005` | Current date Monday 2026-10-05; due Friday 2026-10-09 (four working days) | `ON_TRACK`, `NONE` | _(none)_ |
 | `AC-004` | Due Saturday 2026-10-10 | `effectiveDueDate=2026-10-12` (Monday) | _(none)_ |
 | `AC-004` | Due Sunday 2026-04-26; Monday 2026-04-27 is King's Day | `effectiveDueDate=2026-04-28` (Tuesday) | _(none)_ |
+| `AC-007` | An at-risk obligation with owner and compliance lead emails | `ESCALATED`; `escalationRecipients` contains both emails | _(none)_ |
+| `AC-007` | An overdue obligation with owner and compliance lead emails | `ESCALATED`; `escalationRecipients` contains both emails | _(none)_ |
+| `AC-007` | An on-track obligation | `NONE`; `escalationRecipients` is absent | _(none)_ |

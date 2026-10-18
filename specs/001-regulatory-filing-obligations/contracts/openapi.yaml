@@ -64,6 +64,7 @@ components:
       required:
         - dueDate
         - ownerEmail
+        - complianceLeadEmail
       properties:
         dueDate:
           type: string
@@ -74,6 +75,11 @@ components:
           minLength: 1
           pattern: ".*\\S.*"
           description: Required nonblank owner value; email syntax is not validated.
+        complianceLeadEmail:
+          type: string
+          minLength: 1
+          pattern: ".*\\S.*"
+          description: Required nonblank compliance lead value.
     Obligation:
       type: object
       required:
@@ -106,9 +112,13 @@ components:
           enum:
             - NONE
             - ESCALATED
-        escalationOwner:
-          type: string
-          description: Returned when escalationState is ESCALATED.
+        escalationRecipients:
+          type: array
+          minItems: 2
+          maxItems: 2
+          items:
+            type: string
+          description: Contains the owner and compliance lead emails when escalationState is ESCALATED; omitted when escalationState is NONE.
     Problem:
       type: object
       description: RFC 9457 Problem Details response.
@@ -131,7 +141,7 @@ components:
           format: uri-reference
   responses:
     BadRequest:
-      description: The request contains an invalid due date or blank owner value.
+      description: The request contains an invalid due date or a blank owner or compliance lead value.
       content:
         application/problem+json:
           schema:

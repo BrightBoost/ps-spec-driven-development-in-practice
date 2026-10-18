@@ -10,12 +10,12 @@ class ObligationDeadlineControllerTest {
 
     @Test
     void ac001_createsObligationWithServerAssignedIdAndEffectiveDueDate() {
-        // TODO arrange a valid due date and owner email, POST, assert 201, id, effectiveDueDate
+        // TODO arrange a valid due date and both contact emails, POST, assert 201, id, and effectiveDueDate; verify storage across restart separately
     }
 
     @Test
-    void ac002_rejectsInvalidDueDateOrBlankOwnerWithProblemDetails() {
-        // TODO POST an invalid date and a blank owner, assert 400 and application/problem+json
+    void ac002_rejectsInvalidDueDateOrBlankContactEmailWithProblemDetails() {
+        // TODO POST an invalid date, blank owner, and blank compliance lead in separate cases; assert 400 and application/problem+json
     }
 
     @Test
@@ -39,8 +39,18 @@ class ObligationDeadlineControllerTest {
     }
 
     @Test
-    void ac007_escalationOwnerIsReturnedWhenAtRisk() {
-        // TODO assert escalationState=ESCALATED and escalationOwner
+    void ac007_returnsBothRecipientsWhenAtRisk() {
+        // TODO assert escalationState=ESCALATED and both emails in escalationRecipients
+    }
+
+    @Test
+    void ac007_returnsBothRecipientsWhenOverdue() {
+        // TODO assert escalationState=ESCALATED and both emails in escalationRecipients
+    }
+
+    @Test
+    void ac007_omitsRecipientsWhenOnTrack() {
+        // TODO assert escalationState=NONE and escalationRecipients is absent
     }
 
     @Test

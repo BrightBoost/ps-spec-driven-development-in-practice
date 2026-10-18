@@ -11,11 +11,11 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Status: Todo
 
 ## T-002 Define the obligation representation, server-assigned identifier, and durable storage
-- Goal: An obligation record and a JDBC repository on file-backed H2 that assigns identifiers and survives a restart
+- Goal: An obligation record and a JDBC repository on file-backed H2 that assigns identifiers, stores both contact emails, and survives a restart
 - Spec links: FR-001, FR-002
 - Depends on: T-001
 - Files likely affected: `model/Obligation.java`, `persistence/ObligationRepository.java`, `resources/schema.sql`, `ObligationRepositoryTest.java`
-- Verification: `./mvnw -q -Dtest=ObligationRepositoryTest test`
+- Verification: `./mvnw -q -Dtest=ObligationRepositoryTest test` (assert both emails survive restart)
 - Status: Todo
 
 ## T-003 Implement DeadlineStatePolicy
@@ -27,7 +27,7 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Status: Todo
 
 ## T-004 Create and retrieve endpoints with Problem Details errors
-- Goal: `POST /obligations` and `GET /obligations/{id}`, with 400 and 404 as Problem Details
+- Goal: `POST /obligations` accepts a due date and nonblank owner and compliance lead emails; `GET /obligations/{id}` retrieves it, with 400 and 404 as Problem Details
 - Spec links: AC-001, AC-002, AC-009
 - Depends on: T-002
 - Files likely affected: `api/ObligationController.java`, `api/*Request.java`, `api/*Response.java`, `api/ApiExceptionHandler.java`, `service/ObligationService.java`
@@ -35,10 +35,18 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Status: Todo
 
 ## T-005 Expose escalation state and escalation owner
-- Goal: Escalation state and escalation owner in the obligation response
+- Goal: Obsolete; replaced by T-010 because the response now returns both escalation recipients rather than a single escalation owner
 - Spec links: AC-007
 - Depends on: T-003, T-004
 - Files likely affected: `model/EscalationState.java`, `api/ObligationResponse.java`
+- Verification: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test`
+- Status: Obsolete
+
+## T-010 Expose escalation recipients
+- Goal: Return `ESCALATED` and both contact emails as `escalationRecipients` for AT_RISK and OVERDUE obligations; return `NONE` and omit recipients for ON_TRACK obligations
+- Spec links: AC-007
+- Depends on: T-002, T-003, T-004
+- Files likely affected: `model/EscalationState.java`, `api/ObligationResponse.java`, `service/ObligationService.java`, `ObligationDeadlineControllerTest.java`
 - Verification: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test`
 - Status: Todo
 
@@ -50,8 +58,8 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Verification: `./mvnw -q -Dtest=DueSoonReportTest test`
 - Status: Todo
 
-## T-007 Controller tests for invalid due date and unknown identifier
-- Goal: Evidence for the error paths
+## T-007 Controller tests for invalid due date, blank contact emails, and unknown identifier
+- Goal: Evidence for invalid-date and blank-email create errors, plus the unknown-identifier error
 - Spec links: EC-007, EC-009, AC-002, AC-009
 - Depends on: T-004
 - Files likely affected: `ObligationDeadlineControllerTest.java`
@@ -69,6 +77,6 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 ## T-009 Full verification pass and traceability update
 - Goal: Every acceptance criterion has passing evidence in the plan's traceability table
 - Spec links: all AC-IDs
-- Depends on: T-001 to T-008
+- Depends on: T-001, T-002, T-003, T-004, T-006, T-007, T-008, T-010
 - Verification: `./mvnw test`, independent audit, manual requests
 - Status: Todo

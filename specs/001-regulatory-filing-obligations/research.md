@@ -2,7 +2,7 @@
 
 ## Durable obligation storage
 
-**Decision**: Use a file-backed H2 database through Spring JDBC. Persist the server-generated identifier, submitted due date, owner email, and effective due date. Keep deadline and escalation states derived at read time.
+**Decision**: Use a file-backed H2 database through Spring JDBC. Persist the server-generated identifier, submitted due date, owner email, compliance lead email, and effective due date. Keep deadline and escalation states derived at read time.
 
 **Rationale**: The approved clarification requires records to survive application restarts. H2 provides an embedded relational store that can run with the existing single Spring Boot service and does not require a separately operated database. JDBC keeps the persistence layer small for the feature’s single entity and basic create/read/list operations. Persisting the effective date with the submitted values makes the accepted calendar calculation durable as part of the obligation record.
 
@@ -25,7 +25,7 @@
 
 **Decision**: Base every current-date decision on `LocalDate.now(clock.withZone(ZoneId.of("Europe/Amsterdam")))`; inject the clock into business logic and fix it explicitly in tests. Treat weekdays other than the specified 2026–2027 demo holidays as working days.
 
-**Rationale**: This follows the constitution and makes tests deterministic. Calculate the effective due date by advancing a non-working due date until a working day is reached. Calculate deadline state with overdue taking precedence for dates before today, then `AT_RISK` for zero through three working days away, otherwise `ON_TRACK`. Derive escalation as `ESCALATED` for `AT_RISK` or `OVERDUE` and `NONE` otherwise.
+**Rationale**: This follows the constitution and makes tests deterministic. Calculate the effective due date by advancing a non-working due date until a working day is reached. Calculate deadline state with overdue taking precedence for dates before today, then `AT_RISK` for zero through three working days away, otherwise `ON_TRACK`. Derive escalation as `ESCALATED` with both contact emails as recipients for `AT_RISK` or `OVERDUE`; use `NONE` and omit recipients for `ON_TRACK`.
 
 **Alternatives considered**:
 - Host-default timezone or system clock access in business logic: rejected because results would vary by environment and be difficult to test.
