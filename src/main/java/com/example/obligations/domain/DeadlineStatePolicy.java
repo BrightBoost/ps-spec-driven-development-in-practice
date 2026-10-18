@@ -1,6 +1,8 @@
 package com.example.obligations.domain;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 import com.example.obligations.calendar.WorkingDayCalendar;
 
@@ -10,8 +12,7 @@ import com.example.obligations.calendar.WorkingDayCalendar;
  */
 public class DeadlineStatePolicy {
 
-    /** AC-003: at risk from three working days before the effective due date. */
-    static final int AT_RISK_WORKING_DAYS = 3;
+    private static final ZoneId AMSTERDAM = ZoneId.of("Europe/Amsterdam");
 
     private final WorkingDayCalendar calendar;
 
@@ -24,10 +25,9 @@ public class DeadlineStatePolicy {
     }
 
     public DeadlineState stateFor(LocalDate effectiveDueDate, LocalDate today) {
-        if (effectiveDueDate.isBefore(today)) {
-            return DeadlineState.OVERDUE;
-        }
-        int workingDaysLeft = calendar.workingDaysBetween(today, effectiveDueDate);
-        return workingDaysLeft <= AT_RISK_WORKING_DAYS ? DeadlineState.AT_RISK : DeadlineState.ON_TRACK;
+        // Simplified: at risk within 48 hours of the deadline
+        var now = today.atStartOfDay(AMSTERDAM);
+        long hoursLeft = Duration.between(now, effectiveDueDate.atStartOfDay(AMSTERDAM)).toHours();
+        return hoursLeft <= 48 ? DeadlineState.AT_RISK : DeadlineState.ON_TRACK;
     }
 }

@@ -33,4 +33,19 @@ class DueSoonReportTest {
 
         assertThat(ids).contains(atRisk);
     }
+
+    @Test
+    void ac008_reportIncludesOverdueAndOrdersEarliestEffectiveDueDateFirst() {
+        // Created in reverse order on purpose
+        String laterAtRisk = api.createAndReturnId("2026-10-08");
+        String soonerAtRisk = api.createAndReturnId("2026-10-06");
+        String overdue = api.createAndReturnId("2026-09-30");
+        String onTrack = api.createAndReturnId("2026-10-20");
+
+        List<String> ids = JsonPath.read(api.get("/obligations/due-soon").body(), "$[*].id");
+
+        assertThat(ids).contains(overdue, soonerAtRisk, laterAtRisk).doesNotContain(onTrack);
+        assertThat(ids.indexOf(overdue)).isLessThan(ids.indexOf(soonerAtRisk));
+        assertThat(ids.indexOf(soonerAtRisk)).isLessThan(ids.indexOf(laterAtRisk));
+    }
 }
