@@ -114,7 +114,7 @@ src/
         └── service/        # calendar, state, and escalation tests (AC-003–AC-007)
 ```
 
-**Structure Decision**: Extend the existing single Maven/Spring Boot application and its `com.example.obligations` package. Keep the API, domain/date logic, and JDBC persistence separated within that project; add no frontend or separate deployable.
+**Structure Decision**: Extend the existing single Maven/Spring Boot application and its `com.example.obligations` package. Keep the API, domain/date logic, and JDBC persistence separated within that project; the only UI is a static due-soon report page served by the same application; add no separate frontend or deployable.
 
 ## Complexity Tracking
 
