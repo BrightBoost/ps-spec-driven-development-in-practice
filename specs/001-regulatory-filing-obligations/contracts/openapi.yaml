@@ -1,0 +1,144 @@
+openapi: 3.1.0
+info:
+  title: Regulatory Filing Obligations API
+  version: 1.0.0
+  description: API contract for creating and reviewing regulatory filing obligations.
+paths:
+  /obligations:
+    post:
+      operationId: createObligation
+      summary: Create a regulatory filing obligation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateObligationRequest"
+      responses:
+        "201":
+          description: Obligation created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Obligation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /obligations/{id}:
+    get:
+      operationId: getObligation
+      summary: Retrieve an obligation by its server-assigned identifier
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Obligation found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Obligation"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /obligations/due-soon:
+    get:
+      operationId: listDueSoonObligations
+      summary: List obligations that are at risk or overdue
+      responses:
+        "200":
+          description: Obligations needing attention, earliest effective due date first.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Obligation"
+components:
+  schemas:
+    CreateObligationRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - dueDate
+        - ownerEmail
+      properties:
+        dueDate:
+          type: string
+          format: date
+          description: Due date in ISO-8601 calendar-date format.
+        ownerEmail:
+          type: string
+          minLength: 1
+          pattern: ".*\\S.*"
+          description: Required nonblank owner value; email syntax is not validated.
+    Obligation:
+      type: object
+      required:
+        - id
+        - dueDate
+        - ownerEmail
+        - effectiveDueDate
+        - deadlineState
+        - escalationState
+      properties:
+        id:
+          type: string
+          format: uuid
+        dueDate:
+          type: string
+          format: date
+        ownerEmail:
+          type: string
+        effectiveDueDate:
+          type: string
+          format: date
+        deadlineState:
+          type: string
+          enum:
+            - ON_TRACK
+            - AT_RISK
+            - OVERDUE
+        escalationState:
+          type: string
+          enum:
+            - NONE
+            - ESCALATED
+        escalationOwner:
+          type: string
+          description: Returned when escalationState is ESCALATED.
+    Problem:
+      type: object
+      description: RFC 9457 Problem Details response.
+      required:
+        - type
+        - title
+        - status
+      properties:
+        type:
+          type: string
+          format: uri-reference
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri-reference
+  responses:
+    BadRequest:
+      description: The request contains an invalid due date or blank owner value.
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    NotFound:
+      description: No obligation exists with the requested identifier.
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
