@@ -46,15 +46,6 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Verification: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test`
 - Status: Obsolete
 
-## T-010 Expose escalation recipients
-- Goal: Return `ESCALATED` and both contact emails as `escalationRecipients` for AT_RISK and OVERDUE obligations; return `NONE` and omit recipients for ON_TRACK obligations
-- Spec links: AC-007
-- Depends on: T-002, T-003, T-004
-- Files likely affected: `domain/EscalationState.java`, `api/ObligationResponse.java`, `domain/ObligationService.java`, `ObligationDeadlineControllerTest.java`
-- Verification: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test`
-- Status: Verified
-- Evidence: `ObligationDeadlineControllerTest.ac003_*` and `ac007_*` assert both recipients, 2026-10-06
-
 ## T-006 Due-soon report endpoint and query
 - Goal: `GET /obligations/due-soon` returning AT_RISK and OVERDUE obligations, earliest effective due date first; decide application versus database calculation
 - Spec links: FR-003, AC-008
@@ -89,3 +80,21 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Verification: `./mvnw test`, independent audit, manual requests
 - Status: Verified
 - Evidence: `./mvnw test` passed; independent audit pass for all AC-IDs; traceability table complete, 2026-10-06
+
+## T-010 Expose escalation recipients
+- Goal: Return `ESCALATED` and both contact emails as `escalationRecipients` for AT_RISK and OVERDUE obligations; return `NONE` and omit recipients for ON_TRACK obligations
+- Spec links: AC-007
+- Depends on: T-002, T-003, T-004
+- Files likely affected: `domain/EscalationState.java`, `api/ObligationResponse.java`, `domain/ObligationService.java`, `ObligationDeadlineControllerTest.java`
+- Verification: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test`
+- Status: Verified
+- Evidence: `ObligationDeadlineControllerTest.ac003_*` and `ac007_*` assert both recipients, 2026-10-06
+
+## T-011 Acknowledge an escalated obligation
+- Goal: `POST /obligations/{id}/acknowledgement`; `ACKNOWLEDGED` escalation state; 409 for obligations that are not escalated
+- Spec links: FR-008, AC-007, AC-008, AC-010, DEC-003
+- Depends on: T-010
+- Files likely affected: `domain/EscalationState.java`, `domain/Obligation.java`, `domain/ObligationService.java`, `api/ObligationController.java`, `api/ApiExceptionHandler.java`, `AcknowledgementTest.java`
+- Verification: `./mvnw -q -Dtest=AcknowledgementTest test`, then `./mvnw test` (unchanged AC-003 boundary tests must pass)
+- Status: Done
+- Evidence: `./mvnw -q -Dtest=AcknowledgementTest test` and `./mvnw test` passed; acknowledgment preserves deadline state and acknowledged records remain in due-soon.

@@ -98,6 +98,7 @@ One regulatory filing obligation has one due date, one owner email, one complian
 - **FR-005**: The system shall expose a deadline state of `ON_TRACK`, `AT_RISK`, or `OVERDUE`
 - **FR-006**: The system shall expose escalation as a visible state and shall not send notifications
 - **FR-007**: The system shall reject an unknown obligation identifier with a not-found error
+- **FR-008**: The system shall let the owner or compliance lead acknowledge an escalated obligation, which sets its escalation state to `ACKNOWLEDGED` without changing its deadline state (DEC-003)
 
 ### Non-functional Requirements
 
@@ -137,17 +138,25 @@ WHEN the obligation is retrieved,
 THE SYSTEM SHALL return deadlineState=OVERDUE.
 
 `AC-007`
-WHILE deadlineState is AT_RISK or OVERDUE,
+WHILE deadlineState is AT_RISK or OVERDUE and the obligation has not been acknowledged,
 THE SYSTEM SHALL return escalationState=ESCALATED and escalationRecipients containing the owner email followed by the compliance lead email.
 Otherwise, when deadlineState is ON_TRACK, THE SYSTEM SHALL return escalationState=NONE and omit escalationRecipients.
 
 `AC-008`
 WHEN the due-soon report is requested,
-THE SYSTEM SHALL return all AT_RISK and OVERDUE obligations, earliest effective due date first.
+THE SYSTEM SHALL return all AT_RISK and OVERDUE obligations, earliest effective due date first
+and acknowledged obligations remain in the due-soon report and show ACKNOWLEDGED. 
 
 `AC-009`
 IF an obligation is requested by an identifier that does not exist,
 THEN THE SYSTEM SHALL return status 404 and a Problem Details body.
+
+`AC-010`
+WHEN the owner or compliance lead acknowledges an ESCALATED obligation,
+THE SYSTEM SHALL set escalationState=ACKNOWLEDGED and leave deadlineState unchanged.
+IF an obligation that is not ESCALATED is acknowledged,
+THEN THE SYSTEM SHALL reject the request with status 409 and a Problem Details body.
+
 
 ### Key Entities
 

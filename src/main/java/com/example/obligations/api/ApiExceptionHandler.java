@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.example.obligations.domain.InvalidObligationException;
+import com.example.obligations.domain.ObligationAcknowledgementConflictException;
 import com.example.obligations.domain.ObligationNotFoundException;
 
 /** RFC 9457 Problem Details for every error (NFR-004, constitution principle II). */
@@ -34,6 +35,13 @@ public class ApiExceptionHandler {
     ResponseEntity<ProblemDetail> notFound(ObligationNotFoundException e) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
         problem.setTitle("Obligation not found");
+        return respond(problem);
+    }
+
+    @ExceptionHandler(ObligationAcknowledgementConflictException.class)
+    ResponseEntity<ProblemDetail> acknowledgementConflict(ObligationAcknowledgementConflictException e) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
+        problem.setTitle("Acknowledgement conflict");
         return respond(problem);
     }
 

@@ -29,6 +29,12 @@ class ApiClient {
                 .build());
     }
 
+    HttpResponse<String> post(String path) {
+        return send(HttpRequest.newBuilder(URI.create(baseUrl + path))
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build());
+    }
+
     HttpResponse<String> createObligation(String dueDate) {
         return post("/obligations", """
                 {"dueDate": "%s", "ownerEmail": "owner@example.com", "complianceLeadEmail": "lead@example.com"}

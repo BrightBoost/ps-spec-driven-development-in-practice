@@ -21,9 +21,10 @@ The suite should verify the acceptance criteria listed below, with a fixed clock
 | AC-002 | Submit an invalid due date, a blank owner, and a blank compliance lead; assert HTTP 400 and `application/problem+json`. |
 | AC-003, AC-005, AC-006 | Set the application clock explicitly; verify at-risk, on-track, and overdue boundaries using working-day dates. |
 | AC-004 | Create obligations with weekend and fixed-holiday due dates; assert roll-forward to the next working day. |
-| AC-007 | Verify `ESCALATED` and both recipients for at-risk/overdue records; verify `NONE` and no recipients for on-track records. |
-| AC-008 | Create mixed-state obligations; assert only at-risk and overdue records are returned in ascending effective due-date order. |
+| AC-007 | Verify `ESCALATED` and both recipients for unacknowledged at-risk/overdue records; verify `ACKNOWLEDGED` after acknowledgment and `NONE` with no recipients for on-track records. |
+| AC-008 | Create mixed-state obligations; assert only at-risk and overdue records are returned in ascending effective due-date order, including acknowledged obligations with `ACKNOWLEDGED`. |
 | AC-009 | Request an unknown identifier; assert HTTP 404 and `application/problem+json`. |
+| AC-010 | Acknowledge an escalated obligation; assert `ACKNOWLEDGED` and unchanged deadline state. An on-track obligation returns 409 and `application/problem+json`. |
 
 ## Manual API smoke test
 

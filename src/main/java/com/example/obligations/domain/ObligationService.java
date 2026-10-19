@@ -34,6 +34,19 @@ public class ObligationService {
         return view(obligation, today());
     }
 
+    /** AC-010 */
+    public ObligationView acknowledge(String id) {
+        LocalDate today = today();
+        Obligation obligation = repository.findById(id).orElseThrow(() -> new ObligationNotFoundException(id));
+        if (obligation.acknowledged()
+                || policy.stateFor(obligation.effectiveDueDate(), today) == DeadlineState.ON_TRACK
+                || !repository.acknowledge(id)) {
+            throw new ObligationAcknowledgementConflictException(id);
+        }
+        Obligation acknowledged = repository.findById(id).orElseThrow(() -> new ObligationNotFoundException(id));
+        return view(acknowledged, today);
+    }
+
     /** AC-008: at-risk and overdue obligations, earliest effective due date first. */
     public List<ObligationView> dueSoon() {
         LocalDate today = today();
@@ -48,7 +61,9 @@ public class ObligationService {
 
     private ObligationView view(Obligation obligation, LocalDate today) {
         DeadlineState deadlineState = policy.stateFor(obligation.effectiveDueDate(), today);
-        // AC-007: escalation follows the deadline state
+        if (obligation.acknowledged()) {
+            return new ObligationView(obligation, deadlineState, EscalationState.ACKNOWLEDGED, List.of());
+        }
         if (deadlineState == DeadlineState.ON_TRACK) {
             return new ObligationView(obligation, deadlineState, EscalationState.NONE, List.of());
         }

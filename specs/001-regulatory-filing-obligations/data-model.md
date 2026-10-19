@@ -11,6 +11,7 @@ One persistent record per regulatory filing obligation.
 | `ownerEmail` | String | Stored | Required and nonblank. Do not validate email syntax. |
 | `complianceLeadEmail` | String | Stored | Required and nonblank. |
 | `effectiveDueDate` | ISO-8601 `LocalDate` | Stored | Calculated at creation by rolling a due date on a weekend or fixed demo holiday forward to the next working day. |
+| `acknowledged` | Boolean | Stored; defaults to `false` | Set to `true` when an escalated obligation is acknowledged. Acknowledgment cannot be undone. |
 
 ### Derived response fields
 
@@ -19,8 +20,8 @@ These fields are calculated when an obligation is retrieved or included in the d
 | Field | Type | Rules |
 |---|---|---|
 | `deadlineState` | `ON_TRACK`, `AT_RISK`, or `OVERDUE` | `OVERDUE` when `effectiveDueDate` is before the current Amsterdam date; otherwise `AT_RISK` when the effective date is zero through three working days away; otherwise `ON_TRACK`. |
-| `escalationState` | `ESCALATED` or `NONE` | `ESCALATED` when deadline state is `AT_RISK` or `OVERDUE`; otherwise `NONE`. |
-| `escalationRecipients` | Array of strings or absent | When escalated, contains `ownerEmail` then `complianceLeadEmail`, in that order, without deduplication; absent when escalation state is `NONE`. |
+| `escalationState` | `ESCALATED`, `ACKNOWLEDGED`, or `NONE` | `ACKNOWLEDGED` when the obligation has been acknowledged; otherwise `ESCALATED` when deadline state is `AT_RISK` or `OVERDUE`; otherwise `NONE`. |
+| `escalationRecipients` | Array of strings or absent | When escalated, contains `ownerEmail` then `complianceLeadEmail`, in that order, without deduplication; absent when escalation state is `NONE` or `ACKNOWLEDGED`. |
 
 ## Working-day calendar
 
@@ -28,7 +29,7 @@ Calendar logic uses Monday through Friday, excluding the fixed demo holidays spe
 
 ## Due-soon report
 
-An ordered list of obligation response objects whose derived `deadlineState` is `AT_RISK` or `OVERDUE`, sorted by `effectiveDueDate` ascending. `ON_TRACK` records are excluded.
+An ordered list of obligation response objects whose derived `deadlineState` is `AT_RISK` or `OVERDUE`, sorted by `effectiveDueDate` ascending. Acknowledged obligations remain in the report with `escalationState=ACKNOWLEDGED`; `ON_TRACK` records are excluded.
 
 ## Validation and errors
 

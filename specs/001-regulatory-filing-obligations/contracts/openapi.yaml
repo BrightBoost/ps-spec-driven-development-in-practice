@@ -56,6 +56,28 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Obligation"
+  /obligations/{id}/acknowledgement:
+    post:
+      operationId: acknowledgeObligation
+      summary: Acknowledge an escalated obligation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^obl-[0-9]+$'
+      responses:
+        "200":
+          description: Obligation acknowledged; its deadline state is unchanged.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Obligation"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
 components:
   schemas:
     CreateObligationRequest:
@@ -113,13 +135,14 @@ components:
           enum:
             - NONE
             - ESCALATED
+            - ACKNOWLEDGED
         escalationRecipients:
           type: array
           minItems: 2
           maxItems: 2
           items:
             type: string
-          description: Contains the owner and compliance lead emails when escalationState is ESCALATED; omitted when escalationState is NONE.
+          description: Contains the owner and compliance lead emails when escalationState is ESCALATED; omitted otherwise.
     Problem:
       type: object
       description: RFC 9457 Problem Details response.
@@ -149,6 +172,12 @@ components:
             $ref: "#/components/schemas/Problem"
     NotFound:
       description: No obligation exists with the requested identifier.
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    Conflict:
+      description: The obligation is not currently escalated and cannot be acknowledged.
       content:
         application/problem+json:
           schema:

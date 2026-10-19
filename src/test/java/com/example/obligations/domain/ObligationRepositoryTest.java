@@ -41,10 +41,12 @@ class ObligationRepositoryTest {
         DataSource file = new DriverManagerDataSource("jdbc:h2:file:" + dir.resolve("restart"));
         LocalDate due = LocalDate.of(2026, 10, 8);
         Obligation stored = new ObligationRepository(file).add(due, due, "owner@example.com", "lead@example.com");
+        new ObligationRepository(file).acknowledge(stored.id());
 
         ObligationRepository afterRestart = new ObligationRepository(file);
 
-        assertThat(afterRestart.findById(stored.id())).contains(stored);
+        assertThat(afterRestart.findById(stored.id())).contains(
+                new Obligation(stored.id(), due, due, "owner@example.com", "lead@example.com", true));
         assertThat(afterRestart.add(due, due, "owner@example.com", "lead@example.com").id())
                 .isNotEqualTo(stored.id());
     }

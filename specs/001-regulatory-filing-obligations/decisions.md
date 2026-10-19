@@ -19,3 +19,14 @@
 - Out of scope: showing recipients in the browser view (not required by the spec)
 - Approved by: the lawyer, as product owner
 - Plan: re-approved by Maaike and the viewer, as developer reviewers
+
+
+## DEC-003: Add ACKNOWLEDGED as an escalation state
+
+- Date: 2026-10-19
+- Decision: An escalated obligation can be acknowledged by its owner or compliance lead. Its escalation state becomes `ACKNOWLEDGED`; its deadline state does not change.
+- Rationale: A reviewed escalation must be dismissible without changing or hiding the deadline itself.
+- Alternatives rejected: Deleting the escalation; removing the obligation from the due-soon report (an acknowledged filing is still due, and the lawyer still wants to see it); a separate hidden flag.
+- Excluded: Undoing an acknowledgment (product decision by the lawyer, 2026-10-19).
+- Affected IDs: FR-008 (new), AC-007, AC-008, AC-010 (new); plan (API, escalation, data flow); task T-011 (new)
+- Approved by: the lawyer, as product owner

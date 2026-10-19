@@ -1,7 +1,7 @@
 # Implementation Plan: Regulatory Filing Obligations
 
-Status: Approved for tasking (DEC-002)
-Status history: Draft -> Changes requested -> Approved for tasking (DEC-001) -> Re-approved for tasking (DEC-002)
+Status: Changes requested (DEC-003)
+Status history: Draft -> Changes requested -> Approved for tasking (DEC-001) -> Re-approved for tasking (DEC-002) -> Changes requested (DEC-003)
 
 **Branch**: `001-regulatory-filing-obligations` | **Date**: 2026-10-18 | **Spec**: [spec.md](./spec.md)
 
@@ -9,7 +9,7 @@ Status history: Draft -> Changes requested -> Approved for tasking (DEC-001) -> 
 
 ## Summary
 
-Deliver a Spring Boot REST API for creating, retrieving, and listing regulatory filing obligations. Persist each obligation and its calculated effective due date in a file-backed H2 database so records survive application restarts. Calculate deadline and escalation states from the current Europe/Amsterdam date at read time, using a controllable clock and the fixed 2026–2027 demo holiday calendar. Return both contact emails as escalation recipients for AT_RISK and OVERDUE obligations; ON_TRACK obligations have no recipients.
+Deliver a Spring Boot REST API for creating, retrieving, and listing regulatory filing obligations. Persist each obligation and its calculated effective due date in a file-backed H2 database so records survive application restarts. Calculate deadline and escalation states from the current Europe/Amsterdam date at read time, using a controllable clock and the fixed 2026–2027 demo holiday calendar. Return both contact emails as escalation recipients for AT_RISK and OVERDUE obligations; ON_TRACK obligations have no recipients. An escalated obligation can be acknowledged through `POST /obligations/{id}/acknowledgement`, which sets the escalation state to `ACKNOWLEDGED` without changing the deadline state or removing it from the due-soon report (DEC-003).
 
 ## Technical Context
 
@@ -52,6 +52,8 @@ No gate violations identified.
 - Controller tests for create, retrieve and the unknown-identifier 404
 - Create validation tests for blank owner and compliance lead emails
 - Escalation response tests for AT_RISK and OVERDUE recipients, and ON_TRACK with no recipients
+- Acknowledgment tests: an ESCALATED obligation becomes `ACKNOWLEDGED` with an unchanged deadline state (AC-010); acknowledging an obligation that is not escalated returns 409 as Problem Details (AC-010); acknowledged obligations stay in the due-soon report (AC-008)
+- Regression: the existing AC-003 to AC-006 boundary tests must pass unchanged
 
 ## Traceability
 
@@ -65,9 +67,10 @@ Evidence run: `./mvnw test` passed; manual requests against `./mvnw spring-boot:
 | AC-004 | Working-day calendar | `WorkingDayCalendar.onOrNextWorkingDay` | `WorkingDayCalendarTest`, `DeadlineStatePolicyTest.ac004_*` | `ObligationDeadlineControllerTest.ac004_*` | demo `obl-100` due Sat 10-10 -> effective 10-12 | Verified |
 | AC-005 | Deadline policy | `DeadlineStatePolicy.stateFor` | `DeadlineStatePolicyTest` (4 working days) | `ObligationDeadlineControllerTest.ac005_*` | demo `GET /obligations/obl-101` -> ON_TRACK | Verified |
 | AC-006 | Deadline policy | `DeadlineStatePolicy.stateFor` | `DeadlineStatePolicyTest` (past due) | `ObligationDeadlineControllerTest.ac006_*` | demo `GET /obligations/obl-102` -> OVERDUE | Verified |
-| AC-007 | Escalation (recipients, DEC-002) | `ObligationService.view` | `ObligationServiceTest.ac007_*` | `ObligationDeadlineControllerTest.ac007_*` | demo `obl-100` -> ESCALATED, 2 recipients | Verified |
-| AC-008 | Persistence and report query | `ObligationService.dueSoon` | `ObligationServiceTest.ac008_*` | `DueSoonReportTest` (includes overdue, order) | demo `GET /obligations/due-soon` + browser view | Verified |
+| AC-007 | Escalation (recipients, DEC-002/003) | `ObligationService.view` | `ObligationServiceTest.ac007_*` | `ObligationDeadlineControllerTest.ac007_*`, `AcknowledgementTest` | AT_RISK/OVERDUE return both recipients until acknowledged | Verified |
+| AC-008 | Persistence and report query | `ObligationService.dueSoon` | `ObligationServiceTest.ac008_*` | `DueSoonReportTest`, `AcknowledgementTest` | All AT_RISK/OVERDUE remain sorted; acknowledged entries show `ACKNOWLEDGED` | Verified |
 | AC-009 | Validation and error mapping | `ApiExceptionHandler.notFound` | `ObligationServiceTest.ac009_*` | `ObligationDeadlineControllerTest.ac009_*` | `GET /obligations/obl-999` -> 404 problem+json | Verified |
+| AC-010 | Escalation, Controller | `ObligationService.acknowledge` | `AcknowledgementTest.ac010_*` | `AcknowledgementTest` | `POST /obligations/{id}/acknowledgement` -> ACKNOWLEDGED; AT_RISK/OVERDUE unchanged; ON_TRACK -> 409 Problem Details | Verified |
 
 ## Phase 0: Research
 
@@ -76,7 +79,7 @@ See [research.md](./research.md). The persistence choice is limited to the confi
 ## Phase 1: Design
 
 - [Data model](./data-model.md): persisted obligation fields, derived response state and recipients, calendar rules, and validation.
-- [OpenAPI contract](./contracts/openapi.yaml): create, retrieve, due-soon, and RFC 9457 error responses.
+- [OpenAPI contract](./contracts/openapi.yaml): create, retrieve, due-soon, acknowledge and RFC 9457 error responses.
 - [Quickstart](./quickstart.md): Maven-wrapper verification and end-to-end API checks, including restart persistence.
 
 ### Constitution Re-check

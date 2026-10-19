@@ -11,5 +11,6 @@ public record Obligation(
         LocalDate dueDate,
         LocalDate effectiveDueDate,
         String ownerEmail,
-        String complianceLeadEmail) {
+        String complianceLeadEmail,
+        boolean acknowledged) {
 }

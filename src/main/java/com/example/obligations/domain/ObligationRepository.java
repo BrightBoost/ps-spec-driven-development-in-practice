@@ -37,8 +37,10 @@ public class ObligationRepository {
                     due_date DATE NOT NULL,
                     effective_due_date DATE NOT NULL,
                     owner_email VARCHAR(255) NOT NULL,
-                    compliance_lead_email VARCHAR(255) NOT NULL)
+                    compliance_lead_email VARCHAR(255) NOT NULL,
+                    acknowledged BOOLEAN NOT NULL DEFAULT FALSE)
                 """);
+        jdbc.execute("ALTER TABLE obligation ADD COLUMN IF NOT EXISTS acknowledged BOOLEAN NOT NULL DEFAULT FALSE");
     }
 
     public synchronized Obligation add(LocalDate dueDate, LocalDate effectiveDueDate,
@@ -50,7 +52,11 @@ public class ObligationRepository {
                 INSERT INTO obligation (id, sequence_no, due_date, effective_due_date, owner_email, compliance_lead_email)
                 VALUES (?, ?, ?, ?, ?, ?)
                 """, id, next, dueDate, effectiveDueDate, ownerEmail, complianceLeadEmail);
-        return new Obligation(id, dueDate, effectiveDueDate, ownerEmail, complianceLeadEmail);
+        return new Obligation(id, dueDate, effectiveDueDate, ownerEmail, complianceLeadEmail, false);
+    }
+
+    public boolean acknowledge(String id) {
+        return jdbc.update("UPDATE obligation SET acknowledged = TRUE WHERE id = ? AND acknowledged = FALSE", id) == 1;
     }
 
     public Optional<Obligation> findById(String id) {
@@ -68,6 +74,7 @@ public class ObligationRepository {
                 rs.getObject("due_date", LocalDate.class),
                 rs.getObject("effective_due_date", LocalDate.class),
                 rs.getString("owner_email"),
-                rs.getString("compliance_lead_email"));
+                rs.getString("compliance_lead_email"),
+                rs.getBoolean("acknowledged"));
     }
 }

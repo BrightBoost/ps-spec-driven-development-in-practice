@@ -2,5 +2,6 @@ package com.example.obligations.domain;
 
 public enum EscalationState {
     NONE,
-    ESCALATED
+    ESCALATED,
+    ACKNOWLEDGED
 }
