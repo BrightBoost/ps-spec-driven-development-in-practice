@@ -65,4 +65,18 @@ class ObligationServiceTest {
     void ac009_unknownIdentifierIsNotFound() {
         assertThatThrownBy(() -> service.get("obl-999")).isInstanceOf(ObligationNotFoundException.class);
     }
+
+    @Test
+    void ac010_acknowledgeKeepsDeadlineStateAndRejectsOnTrack() {
+        String escalated = service.create("2026-10-08", "owner@example.com", "lead@example.com").obligation().id();
+        String onTrack = service.create("2026-10-20", "owner@example.com", "lead@example.com").obligation().id();
+
+        ObligationView acknowledged = service.acknowledge(escalated);
+
+        assertThat(acknowledged.escalationState()).isEqualTo(EscalationState.ACKNOWLEDGED);
+        assertThat(acknowledged.deadlineState()).isEqualTo(DeadlineState.AT_RISK);
+        assertThat(service.dueSoon()).extracting(view -> view.obligation().id()).contains(escalated);
+        assertThatThrownBy(() -> service.acknowledge(onTrack))
+                .isInstanceOf(AcknowledgementNotAllowedException.class);
+    }
 }

@@ -20,8 +20,13 @@ public class ObligationRepository {
     public Obligation add(LocalDate dueDate, LocalDate effectiveDueDate,
                           String ownerEmail, String complianceLeadEmail) {
         String id = "obl-" + sequence.getAndIncrement();
-        Obligation obligation = new Obligation(id, dueDate, effectiveDueDate, ownerEmail, complianceLeadEmail);
+        Obligation obligation = new Obligation(id, dueDate, effectiveDueDate, ownerEmail, complianceLeadEmail, false);
         obligations.put(id, obligation);
+        return obligation;
+    }
+
+    public Obligation save(Obligation obligation) {
+        obligations.put(obligation.id(), obligation);
         return obligation;
     }
 

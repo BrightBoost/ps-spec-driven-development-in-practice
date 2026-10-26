@@ -90,3 +90,12 @@ Statuses: `Todo` | `In progress` | `Blocked` | `Done` (the agent reports complet
 - Verification: `./mvnw -q -Dtest=ObligationDeadlineControllerTest test`
 - Status: Verified
 - Evidence: `ObligationDeadlineControllerTest.ac003_*` and `ac007_*` assert both recipients, 2026-10-06
+
+## T-011 Acknowledge an escalated obligation
+- Goal: `POST /obligations/{id}/acknowledgement`; `ACKNOWLEDGED` escalation state; 409 for obligations that are not escalated
+- Spec links: FR-008, AC-007, AC-008, AC-010, DEC-003
+- Depends on: T-010
+- Files likely affected: `domain/EscalationState.java`, `domain/Obligation.java`, `domain/ObligationService.java`, `api/ObligationController.java`, `api/ApiExceptionHandler.java`, `AcknowledgementTest.java`
+- Verification: `./mvnw -q -Dtest=AcknowledgementTest test`, then `./mvnw test` (unchanged AC-003 boundary tests must pass)
+- Status: Verified
+- Evidence: `./mvnw -q -Dtest=AcknowledgementTest test` and `./mvnw test` passed, including `DeadlineStatePolicyTest` boundary table, 2026-10-26

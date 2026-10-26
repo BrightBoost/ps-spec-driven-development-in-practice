@@ -1,7 +1,7 @@
 # Implementation Plan: Regulatory filing obligations
 
-Status: Approved for tasking (DEC-001, re-approved for DEC-002)
-Status history: Draft -> Changes requested -> Approved for tasking -> Changes requested (DEC-002) -> Approved for tasking
+Status: Approved for tasking (DEC-001, re-approved for DEC-002 and DEC-003)
+Status history: Draft -> Changes requested -> Approved for tasking -> Changes requested (DEC-002) -> Approved for tasking -> Changes requested (DEC-003) -> Approved for tasking
 Spec: `.sdd/spec.md` | Constitution: `.specify/memory/constitution.md`
 
 ## Context
@@ -12,10 +12,10 @@ Spring Boot REST API on Java 21, built with the Maven wrapper. Empty project; no
 
 | Area | Responsibility | Spec links |
 |---|---|---|
-| Controller and API contract | `POST /obligations`, `GET /obligations/{id}`, `GET /obligations/due-soon`; ISO-8601 dates on the wire | FR-001, FR-002, FR-003, NFR-001 |
+| Controller and API contract | `POST /obligations`, `GET /obligations/{id}`, `GET /obligations/due-soon`, `POST /obligations/{id}/acknowledgement`; ISO-8601 dates on the wire | FR-001, FR-002, FR-003, FR-008, NFR-001 |
 | Service | Creates obligations, calculates state on read, builds the due-soon report | FR-001 to FR-006 |
 | Deadline policy and working-day calendar | Effective due date (roll-forward); deadline state from effective due date and today | FR-004, FR-005, AC-003 to AC-006, NFR-003 |
-| Escalation | Escalation state and escalation recipients (owner and compliance lead) derived from deadline state | FR-006, AC-007, DEC-002 |
+| Escalation | Escalation state (`NONE`, `ESCALATED`, `ACKNOWLEDGED`) and recipients, derived from deadline state and the stored acknowledgment | FR-006, FR-008, AC-007, AC-010, DEC-002, DEC-003 |
 | Validation and error mapping | 400 and 404 as Problem Details | AC-002, AC-009, NFR-004 |
 | Persistence and report query | In-memory repository; report filters AT_RISK and OVERDUE, sorts by effective due date | FR-003, AC-008 |
 | Clock | Injected `Clock` in Europe/Amsterdam; fixed date in tests and the demo profile | NFR-002 |
@@ -33,7 +33,8 @@ Spring Boot REST API on Java 21, built with the Maven wrapper. Empty project; no
 1. A create request is validated: due date parses as ISO-8601, owner email and compliance lead email are not blank.
 2. The effective due date is calculated once, at creation, and stored with the obligation.
 3. Deadline state and escalation state are calculated on every read, because they depend on today's date. A stored state would be stale by tomorrow morning.
-4. The due-soon report calculates state for every obligation and returns the AT_RISK and OVERDUE ones, earliest effective due date first.
+4. An acknowledgment is stored on the obligation; the deadline state is never stored.
+5. The due-soon report calculates state for every obligation and returns the AT_RISK and OVERDUE ones, earliest effective due date first.
 
 ## Test strategy
 
@@ -57,8 +58,9 @@ Evidence run: `./mvnw test` passed; manual requests against `./mvnw spring-boot:
 | AC-005 | Deadline policy | `DeadlineStatePolicy.stateFor` | `DeadlineStatePolicyTest` (4 working days) | `ObligationDeadlineControllerTest.ac005_*` | demo `GET /obligations/obl-101` -> ON_TRACK | Verified |
 | AC-006 | Deadline policy | `DeadlineStatePolicy.stateFor` | `DeadlineStatePolicyTest` (past due) | `ObligationDeadlineControllerTest.ac006_*` | demo `GET /obligations/obl-102` -> OVERDUE | Verified |
 | AC-007 | Escalation (recipients, DEC-002) | `ObligationService.view` | `ObligationServiceTest.ac007_*` | `ObligationDeadlineControllerTest.ac007_*` | demo `obl-100` -> ESCALATED, 2 recipients | Verified |
-| AC-008 | Persistence and report query | `ObligationService.dueSoon` | `ObligationServiceTest.ac008_*` | `DueSoonReportTest` (includes overdue, order) | demo `GET /obligations/due-soon` + browser view | Verified |
+| AC-008 | Persistence and report query | `ObligationService.dueSoon` | `ObligationServiceTest.ac008_*` | `DueSoonReportTest` (includes overdue, order), `AcknowledgementTest.ac008_*` | demo `GET /obligations/due-soon` + browser view | Verified |
 | AC-009 | Validation and error mapping | `ApiExceptionHandler.notFound` | `ObligationServiceTest.ac009_*` | `ObligationDeadlineControllerTest.ac009_*` | `GET /obligations/obl-999` -> 404 problem+json | Verified |
+| AC-010 | Escalation, Controller | `ObligationService.acknowledge` | `ObligationServiceTest.ac010_*` | `AcknowledgementTest` | `POST /obligations/obl-100/acknowledgement` -> ACKNOWLEDGED, AT_RISK | Verified |
 
 ## Risks
 

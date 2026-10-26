@@ -11,5 +11,10 @@ public record Obligation(
         LocalDate dueDate,
         LocalDate effectiveDueDate,
         String ownerEmail,
-        String complianceLeadEmail) {
+        String complianceLeadEmail,
+        boolean acknowledged) {
+
+    public Obligation acknowledge() {
+        return new Obligation(id, dueDate, effectiveDueDate, ownerEmail, complianceLeadEmail, true);
+    }
 }

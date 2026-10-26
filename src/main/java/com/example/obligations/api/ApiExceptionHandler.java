@@ -8,6 +8,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.example.obligations.domain.AcknowledgementNotAllowedException;
 import com.example.obligations.domain.InvalidObligationException;
 import com.example.obligations.domain.ObligationNotFoundException;
 
@@ -34,6 +35,13 @@ public class ApiExceptionHandler {
     ResponseEntity<ProblemDetail> notFound(ObligationNotFoundException e) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
         problem.setTitle("Obligation not found");
+        return respond(problem);
+    }
+
+    @ExceptionHandler(AcknowledgementNotAllowedException.class)
+    ResponseEntity<ProblemDetail> conflict(AcknowledgementNotAllowedException e) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
+        problem.setTitle("Obligation is not escalated");
         return respond(problem);
     }
 

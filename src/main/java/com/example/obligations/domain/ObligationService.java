@@ -34,6 +34,16 @@ public class ObligationService {
         return view(obligation, today());
     }
 
+    /** AC-010: acknowledge an escalated obligation; the deadline state is unchanged. */
+    public ObligationView acknowledge(String id) {
+        Obligation obligation = repository.findById(id).orElseThrow(() -> new ObligationNotFoundException(id));
+        LocalDate today = today();
+        if (view(obligation, today).escalationState() != EscalationState.ESCALATED) {
+            throw new AcknowledgementNotAllowedException(id);
+        }
+        return view(repository.save(obligation.acknowledge()), today);
+    }
+
     /** AC-008: at-risk and overdue obligations, earliest effective due date first. */
     public List<ObligationView> dueSoon() {
         LocalDate today = today();
@@ -48,11 +58,14 @@ public class ObligationService {
 
     private ObligationView view(Obligation obligation, LocalDate today) {
         DeadlineState deadlineState = policy.stateFor(obligation.effectiveDueDate(), today);
-        // AC-007: escalation follows the deadline state
+        // AC-007: escalation follows the deadline state, unless acknowledged (AC-010, DEC-003)
         if (deadlineState == DeadlineState.ON_TRACK) {
             return new ObligationView(obligation, deadlineState, EscalationState.NONE, List.of());
         }
-        return new ObligationView(obligation, deadlineState, EscalationState.ESCALATED,
+        EscalationState escalationState = obligation.acknowledged()
+                ? EscalationState.ACKNOWLEDGED
+                : EscalationState.ESCALATED;
+        return new ObligationView(obligation, deadlineState, escalationState,
                 List.of(obligation.ownerEmail(), obligation.complianceLeadEmail()));
     }
 

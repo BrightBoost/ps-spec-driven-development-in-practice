@@ -37,6 +37,11 @@ public class ObligationController {
         return service.dueSoon().stream().map(ObligationResponse::from).toList();
     }
 
+    @PostMapping("/{id}/acknowledgement")
+    public ObligationResponse acknowledge(@PathVariable String id) {
+        return ObligationResponse.from(service.acknowledge(id));
+    }
+
     @GetMapping("/{id}")
     public ObligationResponse get(@PathVariable String id) {
         return ObligationResponse.from(service.get(id));
